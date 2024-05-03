@@ -44,7 +44,9 @@ fonts:
 <p class="text-xs abs-bl w-full mb-6 text-center">Prompt: Understand Stable Diffusion from code, cyberpunk theme, best quality, high resolution, concept art</p>
 
 ---
-src: ./slides/intro.md
+src: /slides/intro.md
+---
+
 ---
 level: 2
 layout: center
@@ -535,15 +537,16 @@ def get_embes(self, prompt, max_length):
 ---
 level: 2
 layout: two-cols
+transition: fade
 ---
 
 # 5.1. encode_prompt
 
 <v-clicks every="1" at="1">
 
-- L34: `CLIPTokenizer`: テキスト(prompt)をトークン化。ベクトルにすることで、AIに扱いやすくさせる。
+- L54: `CLIPTokenizer`: テキスト(prompt)をトークン化。ベクトルにすることで、AIに扱いやすくさせる。
 
-- L35: `CLIPTextModel`: 言語と画像のマルチモーダルモデル。画像生成においては、プロンプトで作りたい画像の表現（embedding）を抽出する。
+- L56: `CLIPTextModel`: 言語と画像のマルチモーダルモデル。画像生成においては、プロンプトで作りたい画像の表現（embedding）を抽出する。
 
 </v-clicks>
 
@@ -551,7 +554,7 @@ layout: two-cols
 
 [<mdi-github-circle />pipeline.py#L21-L39](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L21-L39)
 
-```python {all|4|5|4,5}{lines:false,at:1}
+```python {4,5|4|4,5}{lines:false,at:1}
 @classmethod
 def from_pretrained(cls, model_name, device=torch.device("cuda"), dtype=torch.float16):
 	# Ommit comments
@@ -565,7 +568,58 @@ def from_pretrained(cls, model_name, device=torch.device("cuda"), dtype=torch.fl
 
 [<mdi-github-circle />pipeline.py#L50-L57](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L50-L57)
 
-```python {all|54|56|54,56}{lines:true,startLine:50,at:1}
+```python {54,56|54|54,56}{lines:true,startLine:50,at:1}
+def get_embes(self, prompt, max_length):
+	"""
+	Encode the text prompt into embeddings using the text encoder.
+	"""
+	text_inputs = self.tokenizer(prompt, padding="max_length", max_length=max_length, truncation=True, return_tensors="pt")
+	text_input_ids = text_inputs.input_ids.to(self.device)
+	prompt_embeds = self.text_encoder(text_input_ids)[0].to(dtype=self.dtype, device=self.device)
+	return prompt_embeds
+```
+
+---
+level: 2
+layout: two-cols
+transition: fade
+---
+
+# 5.1. encode_prompt
+
+
+- L54: `CLIPTokenizer`: テキスト(prompt)をトークン化。ベクトルにすることで、AIに扱いやすくさせる。
+
+- L56: `CLIPTextModel`: 言語と画像のマルチモーダルモデル。画像生成においては、プロンプトで作りたい画像の表現（embedding）を抽出する。
+
+
+<v-clicks every="1" at="2">
+
+- L46: シンプルにするために、negative_promptは空の文字列としています。
+
+</v-clicks>
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L34-L35](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L34-L35)
+
+```python {all}{lines:true,startLine:34,at:1}
+	tokenizer = CLIPTokenizer.from_pretrained(model_name, subfolder="tokenizer")
+	text_encoder = CLIPTextModel.from_pretrained(model_name, subfolder="text_encoder")
+```
+
+[<mdi-github-circle />pipeline.py#L41-L57](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L41-L57)
+
+```python {|all|46|all}{lines:true,startLine:41,at:1}
+def encode_prompt(self, prompt: str):
+	"""
+	Encode the text prompt into embeddings using the text encoder.
+	"""
+	prompt_embeds = self.get_embes(prompt, self.tokenizer.model_max_length)
+	negative_prompt_embeds = self.get_embes([''], prompt_embeds.shape[1])
+	prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds])
+	return prompt_embeds
+ 
 def get_embes(self, prompt, max_length):
 	"""
 	Encode the text prompt into embeddings using the text encoder.
@@ -612,56 +666,6 @@ level: 2
 		height: 130%;
 	}
 </style>
-
----
-level: 2
-layout: two-cols
----
-
-# 5.1. encode_prompt
-
-<v-clicks every="1" at="1">
-
-- L45: `get_embes`関数を呼びprompt_embedsを取得
-
-- L46: `get_embes`関数を呼びnegative_prompt_embedsを取得 (シンプルにするために、negative_promptは空の文字列としています。)
-
-- L54: CLIPTokenizerでTokenize
-
-- L56: CLIPTextModelでembeddingを取得
-
-</v-clicks>
-
-::right::
-
-[<mdi-github-circle />pipeline.py#L34-L35](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L34-L35)
-
-```python {all|none|none|34|35|all}{lines:true,startLine:34,at:1}
-	tokenizer = CLIPTokenizer.from_pretrained(model_name, subfolder="tokenizer")
-	text_encoder = CLIPTextModel.from_pretrained(model_name, subfolder="text_encoder")
-```
-
-[<mdi-github-circle />pipeline.py#L41-L57](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L41-L57)
-
-```python {all|45|46|54|56|all}{lines:true,startLine:41,at:1}
-def encode_prompt(self, prompt: str):
-	"""
-	Encode the text prompt into embeddings using the text encoder.
-	"""
-	prompt_embeds = self.get_embes(prompt, self.tokenizer.model_max_length)
-	negative_prompt_embeds = self.get_embes([''], prompt_embeds.shape[1])
-	prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds])
-	return prompt_embeds
- 
-def get_embes(self, prompt, max_length):
-	"""
-	Encode the text prompt into embeddings using the text encoder.
-	"""
-	text_inputs = self.tokenizer(prompt, padding="max_length", max_length=max_length, truncation=True, return_tensors="pt")
-	text_input_ids = text_inputs.input_ids.to(self.device)
-	prompt_embeds = self.text_encoder(text_input_ids)[0].to(dtype=self.dtype, device=self.device)
-	return prompt_embeds
-```
 
 ---
 level: 2
@@ -730,7 +734,7 @@ transition: fade
 
 - L86: UNet
 
-- L91: DDIMScheduler
+- L91: Scheduler
 
 </v-clicks>
 
@@ -770,16 +774,16 @@ transition: fade
 
 # 5.3. denoise
 
-<v-clicks every="1">
+- L86: UNet2DConditionModel
 
+- L91: DDIMScheduler
 
-</v-clicks>
 
 ::right::
 
 [<mdi-github-circle />pipeline.py#L21-L39](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L21-L39)
 
-```python {all|7|6,7}{lines:false,at:1}
+```python {6,7}{lines:false,at:1}
 @classmethod
 def from_pretrained(cls, model_name, device=torch.device("cuda"), dtype=torch.float16):
 	# Ommit comments
@@ -793,7 +797,7 @@ def from_pretrained(cls, model_name, device=torch.device("cuda"), dtype=torch.fl
 
 [<mdi-github-circle />pipeline.py#L82-L93](https://github.com/masaishi/parediffusers/blob/035772c684ae8d16c7c908f185f6413b72658126/src/parediffusers/pipeline.py#L82-L93)
 
-```python {all|86|86,91}{lines:true,startLine:82,at:1}
+```python {86,91}{lines:true,startLine:82,at:1}
 	for t in timesteps:
 		latent_model_input = torch.cat([latents] * 2)
 		
@@ -825,9 +829,9 @@ transition: fade
 
 - L86: UNetでデノイズ <br />(<span class="text-sm">timestepと、5.1のprompt_embedsを引数に</span>)
 
-- L88: DDIM $q_\sigma(x_{t-1}|x_t, f_\theta^{(t)}(x_t))$
+- L88: guidance_scale: どれだけプロンプトを考慮するか
 
-$x_{t-1} = \sqrt{\alpha_{t-1}}\left(\frac{x_t - \sqrt{1-\alpha_t}\epsilon_\theta^{(t)}(x_t)}{\sqrt{\alpha_t}}\right) + \sqrt{1-\alpha_{t-1}-\sigma_t^2} \cdot \epsilon_\theta^{(t)}(x_t) + \sigma_t \epsilon_t$
+- L91: Schedulerによって、デノイズの強さを決定
 
 </v-clicks>
 
@@ -883,136 +887,6 @@ def vae_decode(self, latents):
 	image = self.tensor_to_image(image)
 	return image
 ```
-
----
-level: 2
-layout: center
----
-
-それぞれのモデルの説明をする前に
-
-# 5.5. フォルダ構成
-
----
-level: 2
-layout: center
----
-
-<!-- apply style to children -->
-````md magic-move { style: '--slidev-code-font-size: 1.1rem; --slidev-code-line-height: 1.5;' }
-```bash
-parediffusers
-├── __init__.py
-├── defaults.py
-├── models
-│   ├── __init__.py
-│   ├── attension.py
-│   ├── embeddings.py
-│   ├── resnet.py
-│   ├── transformer.py
-│   ├── transformer_blocks.py
-│   ├── unet_2d_blocks.py
-│   ├── unet_2d_get_blocks.py
-│   ├── unet_2d_mid_blocks.py
-│   └── vae_blocks.py
-├── pipeline.py
-├── scheduler.py
-├── unet.py
-├── utils.py
-└── vae.py
-```
-```bash
-parediffusers
-├── __init__.py 
-├── defaults.py
-├── models # UNetやVAEの構築のためのモジュール
-│   ├── __init__.py
-│   ├── attension.py
-│   ├── embeddings.py
-│   ├── resnet.py
-│   ├── transformer.py
-│   ├── transformer_blocks.py
-│   ├── unet_2d_blocks.py
-│   ├── unet_2d_get_blocks.py
-│   ├── unet_2d_mid_blocks.py
-│   └── vae_blocks.py
-├── pipeline.py # 画像生成のためのパイプライン 5. Pipelineで詳しく説明
-├── scheduler.py # DDIMSchedulerの実装 4. Schedulerで詳しく説明
-├── unet.py # UNet2DConditionModelの実装 6. UNetで詳しく説明
-├── utils.py # 活性化関数などのユーティリティ関数
-└── vae.py # AutoencoderKLの実装 8. VAEで詳しく説明
-```
-````
-
----
-level: 2
----
-
-# <span class="text-3xl">[<mdi-github-circle />defaults.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/defaults.py)</span>
-
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fdefaults.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
-
----
-level: 2
----
-
-# <span class="text-3xl">[<mdi-github-circle />models/](https://github.com/masaishi/parediffusers/tree/main/src/parediffusers/models)</span>
-UNetやVAEの構築のためのモジュール
-
-- `attention.py`: TransformerBlockやUnetで使われるAttentionモジュールの実装
-- `embeddings.py`: UNetで使われるTimestepsなどの実装
-- `resnet.py`: UNetで使われるResNetなどの実装
-- `transformer.py`: UNetで使われるTransformerの実装
-- `transformer_blocks.py`: Transformerに使われるTransformerBlockの実装
-- `unet_2d_blocks.py`: get_unet_2d_blocksで使われるUNetBlockの実装
-- `unet_2d_get_blocks.py`: UNetやVAEのEncoderやDecoderで使われるget_up_blockやget_down_blockの実装
-- `unet_2d_mid_blocks.py`: UNetで使われるUNetMidBlockの実装
-- `vae_blocks.py`: VAEで使われるVAEBlockの実装
-
----
-level: 2
----
-
-# <span class="text-3xl">[<mdi-github-circle />pipeline.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/pipeline.py)</span>
-実際にText2Imgを行う
-
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fpipeline.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
-
----
-level: 2
----
-
-# <span class="text-3xl">[<mdi-github-circle />scheduler.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/scheduler.py)</span>
-6. で詳しく説明
-
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fscheduler.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
-
----
-level: 2
----
-
-# <span class="text-3xl">[<mdi-github-circle />unet.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/unet.py)</span>
-7. で詳しく説明
-
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Funet.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
-
----
-level: 2
----
-
-# <span class="text-3xl">[<mdi-github-circle />utils.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/utils.py)</span>
-活性化関数を扱う
-
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Futils.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
-
----
-level: 2
----
-
-# <span class="text-3xl">[<mdi-github-circle />vae.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/vae.py)</span>
-8. で詳しく説明
-
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fvae.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
 ---
 layout: cover
