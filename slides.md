@@ -161,7 +161,8 @@ layout: center
 
 Latent Diffusion Model (LDM)とは?
 
-# Denoising Diffusion Probabilistic Model (DDPM) に Latent Space(滞在空間)という概念を追加した仕組み
+# Latent Space (滞在空間)で、
+# <span v-mark.yellow="1">DDPM</span>を動かすモデル
 
 ---
 level: 2
@@ -174,7 +175,7 @@ Denoising Diffusion Probabilistic Model (DDPM)とは?
 <p>音声などのデータ全般に活用されていますが、このスライドでは画像について説明します。</p>
 
 <ul>
-	<li><span v-mark.red="1">Diffusion process(拡散過程)</span>を用い、学習データの前処理を行う。確率過程（特にマルコフ連鎖)</li>
+	<li><span v-mark.red="1">Diffusion process(拡散過程)</span>を用い、学習データの前処理を行う。確率過程（マルコフ連鎖)</li>
 	<li><span v-mark.blue="2">Reverse process(逆拡散過程)</span>を用い、ノイズを加えられたデータから元のデータを復元する。</li>
 </ul>
 
@@ -192,9 +193,17 @@ level: 2
 layout: center
 ---
 
+# Diffusionは前処理でもNNでもないのに、Diffusion Modelと呼ばれるが面白い
+
+---
+level: 2
+layout: center
+---
+
 Latent Diffusion Model (LDM)とは?
 
-# Latent(滞在)空間で、Denoising Diffusion Probabilistic Model (DDPM) を計算する仕組み
+# <span v-mark.green="1">Latent Space (滞在空間)</span>で、
+# DDPMを動かすモデル
 
 ---
 level: 2
@@ -209,6 +218,7 @@ level: 2
 		</p>
 	</div>
 	<div v-click>
+		<span class="text-xs ml-27.5% mt-0 mb-0">Transformerの次に死ぬほど目にしたStable Diffusionの図</span>
 		<img src="/images/stable-diffusion-figure.png" alt="Stable Diffusion Figure" class="ml-auto mr-auto h-48 object-contain" />
 		<p class="text-black text-xs w-full mt-6 text-center">
 		Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer: “High-Resolution Image Synthesis with Latent Diffusion Models”, 2021; <a href='http://arxiv.org/abs/2112.10752'>arXiv:2112.10752</a>.
@@ -221,20 +231,13 @@ level: 2
 layout: center
 ---
 
-Latent Diffusion Model (LDM)とは?
-
-# Latent(滞在)空間で、Denoising Diffusion Probabilistic Model (DDPM) を計算する仕組み
-
----
-level: 2
-layout: center
----
-
 Latent Space(滞在空間)とは?
 
-# 入力画像の特徴を抽出した空間 
+# 入力画像の特徴を抽出した空間
 
+<!--
 TODO: VAEを通した画像の平均をとった画像を用意する。
+-->
 
 ---
 level: 2
@@ -505,21 +508,18 @@ def get_embes(self, prompt, max_length):
 level: 2
 ---
 
-<iframe frameborder="0" scrolling="no" class="emg-iframe-text-inputs" style="width:90%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2Fmain%2Fembed%2Fch5-text_inputs.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+<iframe frameborder="0" scrolling="no" class="emg-iframe-text-inputs" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2Fmain%2Fembed%2Fch5-text_inputs.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
 
 <style>
 	.emg-iframe-text-inputs {
-		/* apply the transform */
-		/*--scale-factor: 0.1;*/
-		-webkit-transform:scale(0.6);
-		-moz-transform:scale(0.6);
-		-o-transform:scale(0.6);
-		transform:scale(0.6);
-		/* position it, as if it was the original size */
+		transform: scale(0.9) translate(-50%, -50%); /* Apply both transformations */
+		transform-origin: top left;
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		transform: translate(-50%, -50%);
+		width: 100%;
+		height: 100%;
 	}
 </style>
 
@@ -527,24 +527,23 @@ level: 2
 level: 2
 ---
 
-<iframe frameborder="0" scrolling="no" class="emg-iframe-prompt-embeds" style="width:80%; height:110%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2Fmain%2Fembed%2Fch5-prompt_embeds.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+<iframe frameborder="0" scrolling="no" class="emg-iframe-prompt-embeds" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2Fmain%2Fembed%2Fch5-prompt_embeds.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
 <style>
 	.emg-iframe-prompt-embeds {
-		-ms-zoom: 0.65;
-		-moz-transform: scale(0.65);
-		-moz-transform-origin: 0 0;
-		-o-transform: scale(0.65);
-		-o-transform-origin: 0 0;
-		-webkit-transform: scale(0.65);
-		-webkit-transform-origin: 0 0;
-
+		transform: scale(0.8) translate(-50%, -50%); /* Apply both transformations */
+		transform-origin: top left;
 		position: absolute;
-		top: 50%;
+		top: 57%;
 		left: 50%;
-		transform: translate(-50%, -50%);
+		width: 100%;
+		height: 130%;
 	}
 </style>
+
+<!--
+まるでWord2Vec
+-->
 
 ---
 level: 2
@@ -598,9 +597,24 @@ def get_embes(self, prompt, max_length):
 
 ---
 level: 2
+layout: center
 ---
 
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll mt-10" style="width:100%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fnotebooks%2Fch0.0.2_Play_prompt_embeds.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+<h1 class="z-999">まるでWord2Vec</h1>
+
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll emg-iframe-play-prompt-embeds" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fnotebooks%2Fch0.0.2_Play_prompt_embeds.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+<style>
+	.emg-iframe-play-prompt-embeds {
+		transform: scale(0.5) translate(-50%, -50%); /* Apply both transformations */
+		transform-origin: top left;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 100%;
+		height: 160%;
+	}
+</style>
 
 ---
 level: 2
@@ -678,7 +692,7 @@ layout: two-cols
 level: 2
 ---
 
-# フォルダ構成
+それぞれのモデルの説明をする前に
 
 ````md magic-move
 ```bash
