@@ -44,43 +44,7 @@ fonts:
 <p class="text-xs abs-bl w-full mb-6 text-center">Prompt: Understand Stable Diffusion from code, cyberpunk theme, best quality, high resolution, concept art</p>
 
 ---
-title: 自己紹介
----
-
-# 2. 石原 正宗 (Masamune Ishihara)
-<div class="[&>*]:important-leading-10 opacity-80">
-Computer Engineering Undergrad at University of California, Santa Cruz <br />
-AI/MLとGISに興味があります。 <br />
-
-<br />
-
-#### 好きなもの:
-- 紅茶
-- テニス
-- Rebuild.fm (<a href="https://rebuild.fm/223/" target="_blank" class="ml-1.5 border-none!">223: Ear Bleeding Pods (higepon)</a>を聞いてkaggleを始めました。)
-</div>
-
-<div class="mt-10 flex flex-col gap-2">
-  <div>
-		<mdi-github-circle />
-		<a href="https://github.com/masaishi" target="_blank" class="ml-1.5 border-none! font-300">masaishi</a>
-	</div>
-	<div>
-		<mdi-twitter />
-		<a href="https://twitter.com/masaishi2001" target="_blank" class="ml-1.5 border-none! font-300">@masaishi2001</a>
-	</div>
-	<div>
-		<mdi-linkedin />
-		<a href="https://www.linkedin.com/in/masamune-ishihara" target="_blank" class="ml-1.5 border-none! font-300">masamune-ishihara</a>
-	</div>
-	<div class="flex items-center">
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="h-5 w-5"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M304.2 501.5L158.4 320.3 298.2 185c2.6-2.7 1.7-10.5-5.3-10.5h-69.2c-3.5 0-7 1.8-10.5 5.3L80.9 313.5V7.5q0-7.5-7.5-7.5H21.5Q14 0 14 7.5v497q0 7.5 7.5 7.5h51.9q7.5 0 7.5-7.5v-109l30.8-29.3 110.5 140.6c3 3.5 6.5 5.3 10.5 5.3h66.9q5.3 0 6-3z"/></svg>
-		<a href="https://www.kaggle.com/masaishi" target="_blank" class="ml-1.5 border-none! font-300">masaishi</a>
-	</div>
-</div>
-
-<img src="/images/icon_tea_light.png" class="rounded-full w-35 abs-tr mt-12 mr-24" />
-
+src: ./slides/intro.md
 ---
 level: 2
 layout: center
@@ -193,7 +157,8 @@ level: 2
 layout: center
 ---
 
-# Diffusionは前処理でもNNでもないのに、Diffusion Modelと呼ばれるが面白い
+# Diffusionは前処理でもNNでもないのに、
+# Diffusion Modelと呼ばれるが面白い
 
 ---
 level: 2
@@ -204,6 +169,113 @@ Latent Diffusion Model (LDM)とは?
 
 # <span v-mark.green="1">Latent Space (滞在空間)</span>で、
 # DDPMを動かすモデル
+
+---
+level: 2
+layout: center
+transition: fade
+---
+
+目的関数間違い探し
+
+<h2>
+$$
+L_{DM} := \mathbb{E}_{x, \epsilon \sim \mathcal{N}(0, 1),  t}\Big[ \Vert \epsilon - \epsilon_\theta(x_{t},t) \Vert_{2}^{2}\Big] \, .
+$$
+</h2>
+
+<h2>
+$$
+L_{LDM} := \mathbb{E}_{\mathcal{E}(x), \epsilon \sim \mathcal{N}(0, 1),  t}\Big[ \Vert \epsilon - \epsilon_\theta(z_{t},t) \Vert_{2}^{2}\Big] \, .
+$$
+</h2>
+
+<!--
+上がDiffusion Model
+下がLatent Diffusion Model
+
+\mathcal  = 筆記体(カリグラフィー)、なんて読めばいい? AIにおいてはEncorderと読んじゃっていい?
+\mathbb{E}_{x ではなく、VAE Encorderを通したlatent spaceを期待値の計算に使っている。
+-->
+
+---
+level: 2
+layout: center
+transition: fade
+---
+
+Latent Diffusion Model (LDM)
+
+<h2>
+$$
+L_{LDM} := \mathbb{E}_{\mathcal{E}(x), \epsilon \sim \mathcal{N}(0, 1),  t}\Big[ \Vert \epsilon - \epsilon_\theta(z_{t},t) \Vert_{2}^{2}\Big] \, .
+$$
+</h2>
+
+<!--
+\mathcal{E} = VAE Encorder
+\mathcal{N} = ガウシアンノイズ
+\epsilon_\theta = VAE Decoder
+
+E(期待値): 入力データ がEncorderを通してlatent spaceに変換されている。
+VAE Decoderを通すとき、t=timestepを考慮している。
+-->
+
+---
+level: 2
+layout: center
+transition: fade
+---
+
+Latent Diffusion Model (LDM)
+
+<h2>
+$$
+L_{LDM} := \mathbb{E}_{\mathcal{E}(x), \epsilon \sim \mathcal{N}(0, 1),  t}\Big[ \Vert \epsilon - \epsilon_\theta(z_{t},t) \Vert_{2}^{2}\Big] \, .
+$$
+</h2>
+
+<!--
+\mathcal{E} = VAE Encorder
+\mathcal{N} = ガウシアンノイズ
+\epsilon_\theta = VAE Decoder
+
+E(期待値): 入力データ がEncorderを通してlatent spaceに変換されている。
+VAE Decoderを通すとき、t=timestepを考慮している。
+-->
+
+---
+level: 2
+layout: center
+---
+
+Latent Diffusion Model (LDM) with Conditioning
+
+<h2>
+$$
+L_{LDM} := \mathbb{E}_{\mathcal{E}(x), y, \epsilon \sim \mathcal{N}(0, 1), t }\Big[ \Vert \epsilon - \epsilon_\theta(z_{t},t, \tau_\theta(y)) \Vert_{2}^{2}\Big] \, ,
+$$
+</h2>
+
+<v-clicks every="1" at="1">
+
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d}}\right) \cdot V
+$$
+
+$$
+\begin{equation*}
+Q = W^{(i)}_Q \cdot  \varphi_i(z_t), \; K = W^{(i)}_K \cdot \tau_\theta(y),
+  \; V = W^{(i)}_V \cdot \tau_\theta(y) . \nonumber
+%
+\end{equation*}
+$$
+
+</v-clicks>
+
+<!--
+Conditioning、つまりpromptやsemantic map、repres entations, imagesなどを考慮している。
+-->
 
 ---
 level: 2
@@ -649,15 +721,121 @@ def get_latent(self, width: int, height: int):
 level: 2
 layout: custom-two-cols
 leftPercent: 0.4
+transition: fade
 ---
 
 # 5.3. denoise
 
+<v-clicks every="1">
+
+- L86: UNet
+
+- L91: DDIMScheduler
+
+</v-clicks>
+
 ::right::
+
 
 [<mdi-github-circle />pipeline.py#L75-L93](https://github.com/masaishi/parediffusers/blob/035772c684ae8d16c7c908f185f6413b72658126/src/parediffusers/pipeline.py#L75-L93)
 
-```python {all}
+```python {all|86|86,91}{lines:true,startLine:75,at:1}
+@torch.no_grad()
+def denoise(self, latents, prompt_embeds, num_inference_steps=50, guidance_scale=7.5):
+	"""
+	Iteratively denoise the latent space using the diffusion model to produce an image.
+	"""
+	timesteps, num_inference_steps = self.retrieve_timesteps(num_inference_steps)
+
+	for t in timesteps:
+		latent_model_input = torch.cat([latents] * 2)
+		
+		# Predict the noise residual for the current timestep
+		noise_residual = self.unet(latent_model_input, t, encoder_hidden_states=prompt_embeds)
+		uncond_residual, text_cond_residual = noise_residual.chunk(2)
+		guided_noise_residual = uncond_residual + guidance_scale * (text_cond_residual - uncond_residual)
+
+		# Update latents by reversing the diffusion process for the current timestep
+		latents = self.scheduler.step(guided_noise_residual, t, latents)[0]
+
+	return latents
+```
+
+---
+level: 2
+layout: custom-two-cols
+leftPercent: 0.4
+transition: fade
+---
+
+# 5.3. denoise
+
+<v-clicks every="1">
+
+
+</v-clicks>
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L21-L39](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L21-L39)
+
+```python {all|7|6,7}{lines:false,at:1}
+@classmethod
+def from_pretrained(cls, model_name, device=torch.device("cuda"), dtype=torch.float16):
+	# Ommit comments
+	tokenizer = CLIPTokenizer.from_pretrained(model_name, subfolder="tokenizer")
+	text_encoder = CLIPTextModel.from_pretrained(model_name, subfolder="text_encoder")
+	scheduler = PareDDIMScheduler.from_config(model_name, subfolder="scheduler")
+	unet = PareUNet2DConditionModel.from_pretrained(model_name, subfolder="unet")
+	vae = PareAutoencoderKL.from_pretrained(model_name, subfolder="vae")
+	return cls(tokenizer, text_encoder, scheduler, unet, vae, device, dtype)
+```
+
+[<mdi-github-circle />pipeline.py#L82-L93](https://github.com/masaishi/parediffusers/blob/035772c684ae8d16c7c908f185f6413b72658126/src/parediffusers/pipeline.py#L82-L93)
+
+```python {all|86|86,91}{lines:true,startLine:82,at:1}
+	for t in timesteps:
+		latent_model_input = torch.cat([latents] * 2)
+		
+		# Predict the noise residual for the current timestep
+		noise_residual = self.unet(latent_model_input, t, encoder_hidden_states=prompt_embeds)
+		uncond_residual, text_cond_residual = noise_residual.chunk(2)
+		guided_noise_residual = uncond_residual + guidance_scale * (text_cond_residual - uncond_residual)
+
+		# Update latents by reversing the diffusion process for the current timestep
+		latents = self.scheduler.step(guided_noise_residual, t, latents)[0]
+
+	return latents
+```
+
+---
+level: 2
+layout: custom-two-cols
+leftPercent: 0.4
+transition: fade
+---
+
+# 5.3. denoise
+
+<v-clicks every="1">
+
+- L80: timestepsの取得
+
+- L82: timestepsの長さ(<span class="text-sm">=num_inference_steps</span>)分ループ
+
+- L86: UNetでデノイズ <br />(<span class="text-sm">timestepと、5.1のprompt_embedsを引数に</span>)
+
+- L88: DDIM $q_\sigma(x_{t-1}|x_t, f_\theta^{(t)}(x_t))$
+
+$x_{t-1} = \sqrt{\alpha_{t-1}}\left(\frac{x_t - \sqrt{1-\alpha_t}\epsilon_\theta^{(t)}(x_t)}{\sqrt{\alpha_t}}\right) + \sqrt{1-\alpha_{t-1}-\sigma_t^2} \cdot \epsilon_\theta^{(t)}(x_t) + \sigma_t \epsilon_t$
+
+</v-clicks>
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L82-L93](https://github.com/masaishi/parediffusers/blob/035772c684ae8d16c7c908f185f6413b72658126/src/parediffusers/pipeline.py#L82-L93)
+
+```python {all|80|82|86|88|91|all}{lines:true,startLine:75,at:1}
 @torch.no_grad()
 def denoise(self, latents, prompt_embeds, num_inference_steps=50, guidance_scale=7.5):
 	"""
@@ -972,14 +1150,6 @@ background: /backgrounds/summary.png
 # 9. まとめ
 
 <p class="text-xs abs-bl w-full mb-6 text-center">Prompt: Summary, long-exposure photography, masterpieces</p>
-
----
-level: 2
-layout: center
----
-
-# 急にLDMをフルスクラッチで作れと言われても、<br />
-# 書くことができる!
 
 ---
 level: 2
