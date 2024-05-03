@@ -541,10 +541,6 @@ level: 2
 	}
 </style>
 
-<!--
-まるでWord2Vec
--->
-
 ---
 level: 2
 layout: two-cols
@@ -600,8 +596,6 @@ level: 2
 layout: center
 ---
 
-<h1 class="z-999">まるでWord2Vec</h1>
-
 <iframe frameborder="0" scrolling="yes" class="overflow-scroll emg-iframe-play-prompt-embeds" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fnotebooks%2Fch0.0.2_Play_prompt_embeds.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
 <style>
@@ -616,10 +610,14 @@ layout: center
 	}
 </style>
 
+<!--
+まるでWord2Vec
+-->
+
 ---
 level: 2
 layout: custom-two-cols
-leftPercent: 0.4
+leftPercent: 0.3
 ---
 
 # 5.2. get_latent
@@ -637,7 +635,7 @@ leftPercent: 0.4
 [<mdi-github-circle />pipeline.py#L59-L65](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L59-L65)
 
 
-```python {all|63|all}{lines:true,startLine:59,at:1}
+```python {all|63|all}{lines:true,startLine:59,at:1,style:'--slidev-code-font-size: 1rem; --slidev-code-line-height: 1.5;'}
 def get_latent(self, width: int, height: int):
 	"""
 	Generate a random initial latent tensor to start the diffusion process.
@@ -683,18 +681,47 @@ def denoise(self, latents, prompt_embeds, num_inference_steps=50, guidance_scale
 
 ---
 level: 2
-layout: two-cols
+layout: custom-two-cols
+leftPercent: 0.4
 ---
 
 # 5.4. vae_decode
 
+<v-clicks every="1">
+</v-clicks>
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L107-L105](https://github.com/masaishi/parediffusers/blob/035772c684ae8d16c7c908f185f6413b72658126/src/parediffusers/pipeline.py#L107-L115)
+
+```python {all}{lines:true,startLine:107,at:1}
+@torch.no_grad()
+def vae_decode(self, latents):
+	"""
+	Decode the latent tensors using the VAE to produce an image.
+	"""
+	image = self.vae.decode(latents / self.vae.config.scaling_factor)[0]
+	image = self.denormalize(image)
+	image = self.tensor_to_image(image)
+	return image
+```
+
 ---
 level: 2
+layout: center
 ---
 
 それぞれのモデルの説明をする前に
 
-````md magic-move
+# 5.5. フォルダ構成
+
+---
+level: 2
+layout: center
+---
+
+<!-- apply style to children -->
+````md magic-move { style: '--slidev-code-font-size: 1.1rem; --slidev-code-line-height: 1.5;' }
 ```bash
 parediffusers
 ├── __init__.py
@@ -743,15 +770,16 @@ parediffusers
 level: 2
 ---
 
-# defaults.py
+# <span class="text-3xl">[<mdi-github-circle />defaults.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/defaults.py)</span>
 
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll" style="width:100%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fdefaults.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fdefaults.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
 ---
 level: 2
 ---
 
-# models/
+# <span class="text-3xl">[<mdi-github-circle />models/](https://github.com/masaishi/parediffusers/tree/main/src/parediffusers/models)</span>
+UNetやVAEの構築のためのモジュール
 
 - `attention.py`: TransformerBlockやUnetで使われるAttentionモジュールの実装
 - `embeddings.py`: UNetで使われるTimestepsなどの実装
@@ -767,41 +795,46 @@ level: 2
 level: 2
 ---
 
-# pipeline.py
+# <span class="text-3xl">[<mdi-github-circle />pipeline.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/pipeline.py)</span>
+実際にText2Imgを行う
 
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll" style="width:100%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fpipeline.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
-
----
-level: 2
----
-
-# scheduler.py (6. で詳しく説明)
-
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll" style="width:100%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fscheduler.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fpipeline.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
 ---
 level: 2
 ---
 
-# unet.py (7. で詳しく説明)
+# <span class="text-3xl">[<mdi-github-circle />scheduler.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/scheduler.py)</span>
+6. で詳しく説明
 
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll" style="width:100%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Funet.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
-
----
-level: 2
----
-
-# utils.py
-
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll" style="width:100%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Futils.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fscheduler.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
 ---
 level: 2
 ---
 
-# vae.py (8. で詳しく説明)
+# <span class="text-3xl">[<mdi-github-circle />unet.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/unet.py)</span>
+7. で詳しく説明
 
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll" style="width:100%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fvae.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Funet.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+---
+level: 2
+---
+
+# <span class="text-3xl">[<mdi-github-circle />utils.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/utils.py)</span>
+活性化関数を扱う
+
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Futils.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+---
+level: 2
+---
+
+# <span class="text-3xl">[<mdi-github-circle />vae.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/vae.py)</span>
+8. で詳しく説明
+
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fvae.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
 ---
 layout: cover
@@ -817,36 +850,16 @@ background: /backgrounds/scheduler.png
 level: 2
 ---
 
-pipe.scheduler.step(guided_noise_residual, t, latents) をうまく使って、schedulerがどんなことをしているかアニメーションを作りたい。
+# <span class="text-3xl">[<mdi-github-circle />scheduler.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/scheduler.py)</span>
+デノイズの強さを決定
+
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fscheduler.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
 ---
 level: 2
-layout: image-right
-image: /exps/skip-scheduler-result.png
 ---
 
-5個飛ばしでも画像は生成できるのか?
-
-```python
-timesteps, num_inference_steps = pare_pipe.retrieve_timesteps(50)
-timesteps = timesteps[::5]
-
-guidance_scale = 7.5
-
-for i, t in enumerate(timesteps):
-	latent_model_input = torch.cat([latents] * 2)
-	
-	# Predict the noise residual for the current timestep
-	noise_residual = pare_pipe.unet(latent_model_input, t, encoder_hidden_states=prompt_embeds)[0]
-	uncond_residual, text_cond_residual = noise_residual.chunk(2)
-	guided_noise_residual = uncond_residual + guidance_scale * (text_cond_residual - uncond_residual)
-
-	# Update latents by reversing the diffusion process for the current timestep
-	latents = pare_pipe.scheduler.step(guided_noise_residual, t, latents)[0]
-
-image = pare_pipe.vae_decode(latents)
-display(image)
-```
+pipe.scheduler.step(guided_noise_residual, t, latents) をうまく使って、schedulerがどんなことをしているかのアニメーションを作りたい。
 
 ---
 layout: cover
@@ -862,12 +875,57 @@ background: /backgrounds/unet.png
 level: 2
 ---
 
-UNetの構造の図
+# [<mdi-github-circle />unet.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/unet.py)
+デノイジングに使われる
 
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Funet.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+---
+level: 2
+layout: image
+image: /images/unet-figure.png
+backgroundSize: 70%
+class: 'text-black'
+---
+
+<!-- Reference -->
+<p class="text-black text-xs abs-bl w-full mb-6 text-center">
+Olaf Ronneberger, Philipp Fischer, Thomas Brox: “U-Net: Convolutional Networks for Biomedical Image Segmentation”, 2015; <a href='http://arxiv.org/abs/1505.04597'>arXiv:1505.04597</a>.
+</p>
+
+---
+level: 2
+layout: center
+---
+
+# 7.1 モデル作成
+
+```python
+class PareUNet2DConditionModel(nn.Module):
+	def __init__(self, **kwargs):
+		super().__init__()
+		self.config = DotDict(DEFAULT_UNET_CONFIG)
+		self.config.update(kwargs)
+		self.config.only_cross_attention = [self.config.only_cross_attention] * len(self.config.down_block_types)
+		self.config.num_attention_heads = self.config.num_attention_heads or self.config.attention_head_dim
+		self._setup_model_parameters()
+
+		self._build_input_layers()
+		self._build_time_embedding()
+		self._build_down_blocks()
+		self._build_mid_block()
+		self._build_up_blocks()
+		self._build_output_layers()
+```
+
+---
+level: 2
 ---
 
 Transformer使っていること書く?
 
+---
+level: 2
 ---
 
 UNetで滞在空間を作って、平均を取れば特徴が抽出できるアニメーションでも作る?
@@ -883,6 +941,24 @@ background: /backgrounds/vae.png
 <p class="text-xs abs-bl w-full mb-6 text-center">Prompt: VAE, abstract style, highly detailed, colors and shapes</p>
 
 ---
+level: 2
+layout: center
+---
+
+# Variational Autoencoder
+変分自己符号化器 (日本語訳かっこいい!)
+
+---
+level: 2
+---
+
+# [<mdi-github-circle />vae.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/vae.py)
+
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fvae.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+---
+level: 2
+---
 
 VAEを変えても画像が生成できる話?
 画像生成推論サーバーのVAEを変更機能追加は、インターンで最初にやったことなのでちょっと話せるかも。
@@ -896,3 +972,29 @@ background: /backgrounds/summary.png
 # 9. まとめ
 
 <p class="text-xs abs-bl w-full mb-6 text-center">Prompt: Summary, long-exposure photography, masterpieces</p>
+
+---
+level: 2
+layout: center
+---
+
+# 急にLDMをフルスクラッチで作れと言われても、<br />
+# 書くことができる!
+
+---
+level: 2
+layout: center
+---
+
+# ライブラリのコードを読むの楽しい!
+
+---
+level: 2
+layout: center
+---
+
+まとめ
+# 1. プロンプトのエンコード
+# 2. ランダムな潜在空間の生成
+# 3. UNetを用いてデノイジング
+# 4. Latent SpaceからPixel Spaceへのデコード
