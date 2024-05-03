@@ -161,7 +161,7 @@ layout: center
 
 Latent Diffusion Model (LDM)とは?
 
-# Denoising Diffusion Probabilistic Model (DDPM) に Latent(滞在)空間という概念を追加した仕組み
+# Denoising Diffusion Probabilistic Model (DDPM) に Latent Space(滞在空間)という概念を追加した仕組み
 
 ---
 level: 2
@@ -194,7 +194,7 @@ layout: center
 
 Latent Diffusion Model (LDM)とは?
 
-# Denoising Diffusion Probabilistic Model (DDPM) に Latent(滞在)空間という概念を追加した仕組み
+# Latent(滞在)空間で、Denoising Diffusion Probabilistic Model (DDPM) を計算する仕組み
 
 ---
 level: 2
@@ -243,7 +243,7 @@ layout: center
 
 ざっくりした説明
 
-<h1>VAEでエンコードし、Latentを作る<span class="!text-lg">(計算量を削減)</span><br />
+<h1>ランダムなLatentを作る<br />
 UNetで、デノイジングを行う<br />
 VAEでデコードし、画像を生成する</h1>
 
@@ -319,7 +319,7 @@ layout: image-right
 image: /exps/p-sd2-sample-43.png
 ---
 
-# [<mdi-github-circle />PareDiffusers](https://github.com/masaishi/parediffusers)を試す
+# [<mdi-github-circle />PareDiffusers](https://github.com/masaishi/parediffusers)
 ## <!-- TODO: Find better way, currently for avoide below becomes subtitle -->
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1I-qU3hfF19T42ksIh5FC0ReyKZ2hsJvx?usp=sharing)
@@ -346,10 +346,339 @@ display(image)
 ```
 
 ---
+layout: cover
+title: Pipeline
+background: /backgrounds/pipeline.png
+---
+
+# 5. Pipeline
+
+<p class="text-xs abs-bl w-full mb-6 text-center">Prompt: Pipeline, cyberpunk theme, best quality, high resolution, concept art</p>
+
+---
+level: 2
+layout: image
+image: /images/stable-diffusion-figure.png
+backgroundSize: 70%
+class: 'text-black'
+---
+
+<!-- Reference -->
+<p class="text-black text-xs abs-bl w-full mb-6 text-center">
+Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer: “High-Resolution Image Synthesis with Latent Diffusion Models”, 2021; <a href='http://arxiv.org/abs/2112.10752'>arXiv:2112.10752</a>.
+</p>
+
+---
+level: 2
+layout: center
+---
+
+<iframe frameborder="0" scrolling="no" style="width:100%; height:163px;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2F035772c684ae8d16c7c908f185f6413b72658126%2Fsrc%2Fparediffusers%2Fpipeline.py%23L131-L134&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+<div class="w-full flex flex-col justify-center mt-10">
+<img src="/images/stable-diffusion-figure.png" alt="Stable Diffusion Figure" class="h-48 object-contain" />
+<p class="text-black text-xs w-full mt-6 text-center">
+Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer: “High-Resolution Image Synthesis with Latent Diffusion Models”, 2021; <a href='http://arxiv.org/abs/2112.10752'>arXiv:2112.10752</a>.
+</p>
+</div>
+
+---
+level: 2
+layout: center
+---
+
+````md magic-move
+```python {all}{lines:true}
+prompt_embeds = self.encode_prompt(prompt)
+latents = self.get_latent(width, height).unsqueeze(dim=0)
+latents = self.denoise(latents, prompt_embeds, num_inference_steps, guidance_scale)
+image = self.vae_decode(latents)
+```
+```md {all|1|2|3|4|all}
+1. `encode_prompt` : テキストのプロンプトをembeddingに変換する。
+2. `get_latent` : 生成したい画像サイズの、1/8のスケールでランダムなテンソルを生成する。
+3. `denoise` : エンコードされたプロンプトのembeddingから、潜在空間を反復的にデノイズする。
+4. `vae_decode` : デノイズされた潜在空間を画像にデコードする。
+```
+````
+
+---
+level: 2
+layout: two-cols
+transition: fade
+---
+
+# 5.1. encode_prompt
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L41-L48](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L41-L48)
+
+```python {all|45|45-46}{lines:true,startLine:41,at:1}
+def encode_prompt(self, prompt: str):
+	"""
+	Encode the text prompt into embeddings using the text encoder.
+	"""
+	prompt_embeds = self.get_embes(prompt, self.tokenizer.model_max_length)
+	negative_prompt_embeds = self.get_embes([''], prompt_embeds.shape[1])
+	prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds])
+	return prompt_embeds
+```
+
+---
+level: 2
+layout: two-cols
+transition: fade
+---
+
+# 5.1. encode_prompt
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L41-L57](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L41-L57)
+
+```python {all|54|54,56}{lines:true,startLine:41,at:1}
+def encode_prompt(self, prompt: str):
+	"""
+	Encode the text prompt into embeddings using the text encoder.
+	"""
+	prompt_embeds = self.get_embes(prompt, self.tokenizer.model_max_length)
+	negative_prompt_embeds = self.get_embes([''], prompt_embeds.shape[1])
+	prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds])
+	return prompt_embeds
+ 
+def get_embes(self, prompt, max_length):
+	"""
+	Encode the text prompt into embeddings using the text encoder.
+	"""
+	text_inputs = self.tokenizer(prompt, padding="max_length", max_length=max_length, truncation=True, return_tensors="pt")
+	text_input_ids = text_inputs.input_ids.to(self.device)
+	prompt_embeds = self.text_encoder(text_input_ids)[0].to(dtype=self.dtype, device=self.device)
+	return prompt_embeds
+```
+
+---
+level: 2
+layout: two-cols
+---
+
+# 5.1. encode_prompt
+
+<v-clicks every="1" at="1">
+
+- L34: `CLIPTokenizer`: テキスト(prompt)をトークン化。ベクトルにすることで、AIに扱いやすくさせる。
+
+- L35: `CLIPTextModel`: 言語と画像のマルチモーダルモデル。画像生成においては、プロンプトで作りたい画像の表現（embedding）を抽出する。
+
+</v-clicks>
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L21-L39](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L21-L39)
+
+```python {all|4|5|4,5}{lines:false,at:1}
+@classmethod
+def from_pretrained(cls, model_name, device=torch.device("cuda"), dtype=torch.float16):
+	# Ommit comments
+	tokenizer = CLIPTokenizer.from_pretrained(model_name, subfolder="tokenizer")
+	text_encoder = CLIPTextModel.from_pretrained(model_name, subfolder="text_encoder")
+	scheduler = PareDDIMScheduler.from_config(model_name, subfolder="scheduler")
+	unet = PareUNet2DConditionModel.from_pretrained(model_name, subfolder="unet")
+	vae = PareAutoencoderKL.from_pretrained(model_name, subfolder="vae")
+	return cls(tokenizer, text_encoder, scheduler, unet, vae, device, dtype)
+```
+
+[<mdi-github-circle />pipeline.py#L50-L57](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L50-L57)
+
+```python {all|54|56|54,56}{lines:true,startLine:50,at:1}
+def get_embes(self, prompt, max_length):
+	"""
+	Encode the text prompt into embeddings using the text encoder.
+	"""
+	text_inputs = self.tokenizer(prompt, padding="max_length", max_length=max_length, truncation=True, return_tensors="pt")
+	text_input_ids = text_inputs.input_ids.to(self.device)
+	prompt_embeds = self.text_encoder(text_input_ids)[0].to(dtype=self.dtype, device=self.device)
+	return prompt_embeds
+```
+
+---
 level: 2
 ---
 
-# 大雑把に紹介し、5~9で詳しく説明する。
+<iframe frameborder="0" scrolling="no" class="emg-iframe-text-inputs" style="width:90%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2Fmain%2Fembed%2Fch5-text_inputs.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+<style>
+	.emg-iframe-text-inputs {
+		/* apply the transform */
+		/*--scale-factor: 0.1;*/
+		-webkit-transform:scale(0.6);
+		-moz-transform:scale(0.6);
+		-o-transform:scale(0.6);
+		transform:scale(0.6);
+		/* position it, as if it was the original size */
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+</style>
+
+---
+level: 2
+---
+
+<iframe frameborder="0" scrolling="no" class="emg-iframe-prompt-embeds" style="width:80%; height:110%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2Fmain%2Fembed%2Fch5-prompt_embeds.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+<style>
+	.emg-iframe-prompt-embeds {
+		-ms-zoom: 0.65;
+		-moz-transform: scale(0.65);
+		-moz-transform-origin: 0 0;
+		-o-transform: scale(0.65);
+		-o-transform-origin: 0 0;
+		-webkit-transform: scale(0.65);
+		-webkit-transform-origin: 0 0;
+
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+</style>
+
+---
+level: 2
+layout: two-cols
+---
+
+# 5.1. encode_prompt
+
+<v-clicks every="1" at="1">
+
+- L45: `get_embes`関数を呼びprompt_embedsを取得
+
+- L46: `get_embes`関数を呼びnegative_prompt_embedsを取得 (シンプルにするために、negative_promptは空の文字列としています。)
+
+- L54: CLIPTokenizerでTokenize
+
+- L56: CLIPTextModelでembeddingを取得
+
+</v-clicks>
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L34-L35](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L34-L35)
+
+```python {all|none|none|34|35|all}{lines:true,startLine:34,at:1}
+	tokenizer = CLIPTokenizer.from_pretrained(model_name, subfolder="tokenizer")
+	text_encoder = CLIPTextModel.from_pretrained(model_name, subfolder="text_encoder")
+```
+
+[<mdi-github-circle />pipeline.py#L41-L57](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L41-L57)
+
+```python {all|45|46|54|56|all}{lines:true,startLine:41,at:1}
+def encode_prompt(self, prompt: str):
+	"""
+	Encode the text prompt into embeddings using the text encoder.
+	"""
+	prompt_embeds = self.get_embes(prompt, self.tokenizer.model_max_length)
+	negative_prompt_embeds = self.get_embes([''], prompt_embeds.shape[1])
+	prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds])
+	return prompt_embeds
+ 
+def get_embes(self, prompt, max_length):
+	"""
+	Encode the text prompt into embeddings using the text encoder.
+	"""
+	text_inputs = self.tokenizer(prompt, padding="max_length", max_length=max_length, truncation=True, return_tensors="pt")
+	text_input_ids = text_inputs.input_ids.to(self.device)
+	prompt_embeds = self.text_encoder(text_input_ids)[0].to(dtype=self.dtype, device=self.device)
+	return prompt_embeds
+```
+
+---
+level: 2
+---
+
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll mt-10" style="width:100%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fnotebooks%2Fch0.0.2_Play_prompt_embeds.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+---
+level: 2
+layout: custom-two-cols
+leftPercent: 0.4
+---
+
+# 5.2. get_latent
+
+<v-clicks every="1">
+
+- L63: 1/8のサイズのランダムなテンソルを生成
+
+<img src="/exps/latent.png" class="mt-5 h-48 object-contain" />
+
+</v-clicks>
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L59-L65](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L59-L65)
+
+
+```python {all|63|all}{lines:true,startLine:59,at:1}
+def get_latent(self, width: int, height: int):
+	"""
+	Generate a random initial latent tensor to start the diffusion process.
+	"""
+	return torch.randn((4, width // 8, height // 8)).to(
+		device=self.device, dtype=self.dtype
+	)
+```
+
+---
+level: 2
+layout: custom-two-cols
+leftPercent: 0.4
+---
+
+# 5.3. denoise
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L75-L93](https://github.com/masaishi/parediffusers/blob/035772c684ae8d16c7c908f185f6413b72658126/src/parediffusers/pipeline.py#L75-L93)
+
+```python {all}
+@torch.no_grad()
+def denoise(self, latents, prompt_embeds, num_inference_steps=50, guidance_scale=7.5):
+	"""
+	Iteratively denoise the latent space using the diffusion model to produce an image.
+	"""
+	timesteps, num_inference_steps = self.retrieve_timesteps(num_inference_steps)
+
+	for t in timesteps:
+		latent_model_input = torch.cat([latents] * 2)
+		
+		# Predict the noise residual for the current timestep
+		noise_residual = self.unet(latent_model_input, t, encoder_hidden_states=prompt_embeds)
+		uncond_residual, text_cond_residual = noise_residual.chunk(2)
+		guided_noise_residual = uncond_residual + guidance_scale * (text_cond_residual - uncond_residual)
+
+		# Update latents by reversing the diffusion process for the current timestep
+		latents = self.scheduler.step(guided_noise_residual, t, latents)[0]
+
+	return latents
+```
+
+---
+level: 2
+layout: two-cols
+---
+
+# 5.4. vae_decode
+
+---
+level: 2
+---
+
+# フォルダ構成
 
 ````md magic-move
 ```bash
@@ -424,7 +753,7 @@ level: 2
 level: 2
 ---
 
-# pipeline.py (5. で詳しく説明)
+# pipeline.py
 
 <iframe frameborder="0" scrolling="yes" class="overflow-scroll" style="width:100%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fpipeline.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
@@ -459,162 +788,6 @@ level: 2
 # vae.py (8. で詳しく説明)
 
 <iframe frameborder="0" scrolling="yes" class="overflow-scroll" style="width:100%; height:90%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fvae.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
-
----
-layout: cover
-title: Pipeline
-background: /backgrounds/pipeline.png
----
-
-# 5. Pipeline
-
-<p class="text-xs abs-bl w-full mb-6 text-center">Prompt: Pipeline, cyberpunk theme, best quality, high resolution, concept art</p>
-
----
-level: 2
-layout: image
-image: /images/stable-diffusion-figure.png
-backgroundSize: 70%
-class: 'text-black'
----
-
-<!-- Reference -->
-<p class="text-black text-xs abs-bl w-full mb-6 text-center">
-Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer: “High-Resolution Image Synthesis with Latent Diffusion Models”, 2021; <a href='http://arxiv.org/abs/2112.10752'>arXiv:2112.10752</a>.
-</p>
-
----
-level: 2
-layout: center
----
-
-<iframe frameborder="0" scrolling="no" style="width:100%; height:163px;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2F035772c684ae8d16c7c908f185f6413b72658126%2Fsrc%2Fparediffusers%2Fpipeline.py%23L131-L134&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
-
-<div class="w-full flex flex-col justify-center mt-10">
-<img src="/images/stable-diffusion-figure.png" alt="Stable Diffusion Figure" class="h-48 object-contain" />
-<p class="text-black text-xs w-full mt-6 text-center">
-Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer: “High-Resolution Image Synthesis with Latent Diffusion Models”, 2021; <a href='http://arxiv.org/abs/2112.10752'>arXiv:2112.10752</a>.
-</p>
-</div>
-
----
-level: 2
-layout: center
----
-
-````md magic-move
-```python {all}{lines:true}
-prompt_embeds = self.encode_prompt(prompt)
-latents = self.get_latent(width, height).unsqueeze(dim=0)
-latents = self.denoise(latents, prompt_embeds, num_inference_steps, guidance_scale)
-image = self.vae_decode(latents)
-```
-```python {all}{lines:true}
-encode_prompt(prompt)
-get_latent(width, height).unsqueeze(dim=0)
-denoise(latents, prompt_embeds, num_inference_steps, guidance_scale)
-vae_decode(latents)
-```
-```md {all|1|2|3|4}
-1. `encode_prompt` : テキストのプロンプトをembeddingに変換する。
-2. `get_latent` : 生成したい画像サイズの、1/8のスケールでランダムなテンソルを生成する。
-3. `denoise` : エンコードされたプロンプトのembeddingから、潜在空間を反復的にデノイズする。
-4. `vae_decode` : デノイズされた潜在空間を画像にデコードする。
-```
-````
-
----
-level: 2
-layout: two-cols
----
-
-# 5.1. encode_prompt
-
-<v-clicks every="1">
-
-- L45: `get_embes`関数を呼びprompt_embedsを取得
-
-- L46: `get_embes`関数を呼びnegative_prompt_embedsを取得 (シンプルにするために、negative_promptは空の文字列としています。)
-
-- L54: CLIPTokenizerを使って、プロンプトをトークン化
-
-- L56: CLIPTextModelにトークン化されたプロンプトを渡してembeddingを得る
-
-</v-clicks>
-
-::right::
-
-[<mdi-github-circle />pipeline.py#L41-L57](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L41-L57)
-
-```python {all|45|46|54|56|all}{lines:true,startLine:41,at:1}
-def encode_prompt(self, prompt: str):
-	"""
-	Encode the text prompt into embeddings using the text encoder.
-	"""
-	prompt_embeds = self.get_embes(prompt, self.tokenizer.model_max_length)
-	negative_prompt_embeds = self.get_embes([''], prompt_embeds.shape[1])
-	prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds])
-	return prompt_embeds
- 
-def get_embes(self, prompt, max_length):
-	"""
-	Encode the text prompt into embeddings using the text encoder.
-	"""
-	text_inputs = self.tokenizer(prompt, padding="max_length", max_length=max_length, truncation=True, return_tensors="pt")
-	text_input_ids = text_inputs.input_ids.to(self.device)
-	prompt_embeds = self.text_encoder(text_input_ids)[0].to(dtype=self.dtype, device=self.device)
-	return prompt_embeds
-```
-
----
-level: 2
----
-
-propt embeddingでWord2Vecのように画像を生成できるコラム？
-
----
-level: 2
-layout: two-cols
----
-
-# 5.2. get_latent
-
-<v-clicks every="1">
-
-- L63: 1/8のサイズのランダムなテンソルを生成
-
-<img src="/exps/latent.png" class="mt-5 h-48 object-contain" />
-
-</v-clicks>
-
-::right::
-
-[<mdi-github-circle />pipeline.py#L59-L65](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L59-L65)
-
-
-```python {all|63|all}{lines:true,startLine:59,at:1}
-	def get_latent(self, width: int, height: int):
-		"""
-		Generate a random initial latent tensor to start the diffusion process.
-		"""
-		return torch.randn((4, width // 8, height // 8)).to(
-			device=self.device, dtype=self.dtype
-		)
-```
-
----
-level: 2
-layout: two-cols
----
-
-# 5.3. denoise
-
----
-level: 2
-layout: two-cols
----
-
-# 5.4. vae_decode
 
 ---
 layout: cover
