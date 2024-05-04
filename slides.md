@@ -125,6 +125,27 @@ level: 2
 layout: center
 ---
 
+ざっくりしたLDMの説明
+
+<h1>1. PromptをEmbeddingに変換する<br />
+2. ランダムなLatentを作る<br />
+3. UNetで、デノイジングを行う<br />
+4. VAEでデコードし、画像を生成する</h1>
+
+---
+level: 2
+layout: center
+---
+
+実際にText2Imgを行うコード
+
+<iframe frameborder="0" scrolling="no" style="width:45rem; height:163px;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2F035772c684ae8d16c7c908f185f6413b72658126%2Fsrc%2Fparediffusers%2Fpipeline.py%23L131-L134&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+---
+level: 2
+layout: center
+---
+
 Latent Diffusion Model (LDM)とは?
 
 # Latent Space (滞在空間)で、
@@ -320,9 +341,10 @@ layout: center
 
 ざっくりした説明
 
-<h1>ランダムなLatentを作る<br />
-UNetで、デノイジングを行う<br />
-VAEでデコードし、画像を生成する</h1>
+<h1>1. PromptをEmbeddingに変換する<br />
+2. ランダムなLatentを作る<br />
+3. UNetで、デノイジングを行う<br />
+4. VAEでデコードし、画像を生成する</h1>
 
 ---
 level: 2
@@ -724,7 +746,7 @@ def get_latent(self, width: int, height: int):
 ---
 level: 2
 layout: custom-two-cols
-leftPercent: 0.4
+leftPercent: 0.5
 transition: fade
 ---
 
@@ -768,7 +790,7 @@ def denoise(self, latents, prompt_embeds, num_inference_steps=50, guidance_scale
 ---
 level: 2
 layout: custom-two-cols
-leftPercent: 0.4
+leftPercent: 0.5
 transition: fade
 ---
 
@@ -815,25 +837,59 @@ def from_pretrained(cls, model_name, device=torch.device("cuda"), dtype=torch.fl
 ---
 level: 2
 layout: custom-two-cols
-leftPercent: 0.4
-transition: fade
+leftPercent: 0.5
 ---
 
 # 5.3. denoise
 
 <v-clicks every="1">
 
-- L80: timestepsの取得
+- L80: Schedulerを使いtimestepsの取得 <br />(<span class="text-sm">7. Schedulerで詳しく説明</span>)
 
-- L82: timestepsの長さ(<span class="text-sm">=num_inference_steps</span>)分ループ
+- L82: timestepsの長さ分ループ<br />(<span class="text-sm">timestepsの長さ分 = num_inference_steps</span>)
 
-- L86: UNetでデノイズ <br />(<span class="text-sm">timestepと、5.1のprompt_embedsを引数に</span>)
+- L86: UNetでデノイズ <br />(<span class="text-sm">8. UNetで詳しく説明</span>)
 
-- L88: guidance_scale: どれだけプロンプトを考慮するか
+- L88: どれだけプロンプトを考慮するかを計算 <br />(<span class="text-3">参考: 
+Jonathan Ho, Tim Salimans: “Classifier-Free Diffusion Guidance”, 2022; <a href='http://arxiv.org/abs/2207.12598'>arXiv:2207.12598</a>.</span>)
 
 - L91: Schedulerによって、デノイズの強さを決定
 
 </v-clicks>
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L82-L93](https://github.com/masaishi/parediffusers/blob/035772c684ae8d16c7c908f185f6413b72658126/src/parediffusers/pipeline.py#L82-L93)
+
+```python {all|80|82|86|88|91|all}{lines:true,startLine:75,at:1}
+@torch.no_grad()
+def denoise(self, latents, prompt_embeds, num_inference_steps=50, guidance_scale=7.5):
+	"""
+	Iteratively denoise the latent space using the diffusion model to produce an image.
+	"""
+	timesteps, num_inference_steps = self.retrieve_timesteps(num_inference_steps)
+
+	for t in timesteps:
+		latent_model_input = torch.cat([latents] * 2)
+		
+		# Predict the noise residual for the current timestep
+		noise_residual = self.unet(latent_model_input, t, encoder_hidden_states=prompt_embeds)
+		uncond_residual, text_cond_residual = noise_residual.chunk(2)
+		guided_noise_residual = uncond_residual + guidance_scale * (text_cond_residual - uncond_residual)
+
+		# Update latents by reversing the diffusion process for the current timestep
+		latents = self.scheduler.step(guided_noise_residual, t, latents)[0]
+
+	return latents
+```
+
+---
+level: 2
+layout: center
+---
+
+# 5.3. denoise
+SchedulerとUNetを使うということだけ覚えておいてください。
 
 ::right::
 
@@ -1037,8 +1093,26 @@ level: 2
 layout: center
 ---
 
+## ライブラリの至る所で、論文が引用
+
+[<mdi-github-circle />diffusers/.../pipeline.py](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py)
+
+<img src="/images/diffusers-code-arxiv.png" class="mt-5 h-92 object-contain" />
+
+---
+level: 2
+layout: center
+---
+
 まとめ
 # 1. プロンプトのエンコード
 # 2. ランダムな潜在空間の生成
 # 3. UNetを用いてデノイジング
 # 4. Latent SpaceからPixel Spaceへのデコード
+
+---
+level: 2
+layout: center
+---
+
+# ご清聴ありがとうございました！
