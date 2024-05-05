@@ -313,6 +313,7 @@ display(image)
 ---
 level: 2
 layout: center
+transition: fade
 ---
 
 <div v-click=1 v-click.hide=2>
@@ -339,13 +340,27 @@ def __call__(self, prompt: str, height: int = 512, width: int = 512, ...):
 3. `denoise` : プロンプトのembeddingから、UNetとSchedulerを用い反復的にデノイズする。
 4. `vae_decode` : デノイズされた潜在空間を画像空間にデコードする。
 ```
-```md {all|1|2|3|4|all}
+```md {all}
 1. `encode_prompt` : PromptをEmbeddingに変換する
 2. `get_latent` : ランダムなLatentを作る
 3. `denoise` : SchedulerとUNetを使って、デノイズを行う
 4. `vae_decode` : VAEで、画像にデコードする
 ```
 ````
+
+---
+level: 2
+layout: center
+---
+
+```md {all|1|2|3|4|all}{lines:false, style:'--slidev-code-font-size: 1.2rem; --slidev-code-line-height: 1.5;'}
+1. `encode_prompt` : PromptをEmbeddingに変換する
+2. `get_latent` : ランダムなLatentを作る
+3. `denoise` : SchedulerとUNetを使って、デノイズを行う
+4. `vae_decode` : VAEで、画像にデコードする
+```
+
+<img src="/images/ldm-4step-figure.png" class="mt-5" />
 
 ---
 level: 2
