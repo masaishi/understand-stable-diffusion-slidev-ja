@@ -65,7 +65,7 @@ layout: center
 
 このスライドの目的
 
-# 画像生成のコードを1通り紹介したい。
+# 画像生成の流れをコードと一緒に紹介したい
 
 ---
 level: 2
@@ -100,11 +100,11 @@ title: 目次
 
 ---
 layout: cover
-title: Stable Diffusionの概要
+title: 画像生成の流れ
 background: /backgrounds/stable-diffusion.png
 ---
 
-# 4. Stable Diffusionの概要
+# 4. 画像生成の流れ
 
 <p class="text-xs abs-bl w-full mb-6 text-center">Prompt: Stable Diffusion, watercolor painting, best quality, high resolution</p>
 
@@ -125,21 +125,181 @@ level: 2
 layout: center
 ---
 
-ざっくりしたLDMの説明
+# Diffusersとは?
 
-<h1>1. PromptをEmbeddingに変換する<br />
-2. ランダムなLatentを作る<br />
-3. UNetで、デノイジングを行う<br />
-4. VAEでデコードし、画像を生成する</h1>
+- Hugging Face🤗によって開発されたDiffusion Modelsを扱うライブラリ
+- 画像生成モデルを簡単に動かすことができる。
+- <mdi-github-circle /> https://github.com/huggingface/diffusers
+
+---
+level: 2
+layout: image-right
+image: /exps/d-sd2-sample-42.png
+---
+
+# [<mdi-github-circle />Diffusers](https://github.com/huggingface/diffusers)を試す
+## <!-- TODO: Find better way, currently for avoide below becomes subtitle -->
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1EbqeoWL5kPaDA8INLWl8g34v3vn83AQ5?usp=sharing)
+
+Install the Diffusers library:
+```python
+!pip install transformers diffusers accelerate -U
+```
+
+Generate an image from text:
+```python {all|4-7|8|10|all}{lines:true}
+import torch
+from diffusers import StableDiffusionPipeline
+
+pipe = StableDiffusionPipeline.from_pretrained(
+  "stabilityai/stable-diffusion-2",
+  dtype=torch.float16,
+).to(device=torch.device("cuda"))
+prompt = "painting depicting the sea, sunrise, ship, artstation, 4k, concept art"
+
+image = pipe(prompt, width=512, height=512).images[0]
+display(image)
+```
 
 ---
 level: 2
 layout: center
 ---
 
-実際にText2Imgを行うコード
+# Diffusersは機能が豊富で柔軟性も高いが、<br />
+# その分コードの理解に時間がかかる。
 
-<iframe frameborder="0" scrolling="no" style="width:45rem; height:163px;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2F035772c684ae8d16c7c908f185f6413b72658126%2Fsrc%2Fparediffusers%2Fpipeline.py%23L131-L134&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+---
+level: 2
+---
+
+# [<mdi-github-circle />diffusers/.../pipeline_stable_diffusion.py](https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/stable_diffusion/pipeline_stable_diffusion.py)
+
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll mt-10" style="width:100%; height:85%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fhuggingface%2Fdiffusers%2Fblob%2Fmain%2Fsrc%2Fdiffusers%2Fpipelines%2Fstable_diffusion%2Fpipeline_stable_diffusion.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+---
+level: 2
+---
+
+# [<mdi-github-circle />parediffusers/.../pipeline.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/pipeline.py)
+
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll mt-10" style="width:100%; height:85%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fpipeline.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+---
+level: 2
+layout: image-right
+image: /exps/p-sd2-sample-43.png
+---
+
+# [<mdi-github-circle />PareDiffusers](https://github.com/masaishi/parediffusers)
+## <!-- TODO: Find better way, currently for avoide below becomes subtitle -->
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1I-qU3hfF19T42ksIh5FC0ReyKZ2hsJvx?usp=sharing)
+
+Install the PareDiffusers library:
+```python
+!pip install parediffusers
+```
+
+Generate an image from text:
+```python {all}{lines:true}
+import torch
+from parediffusers import PareDiffusionPipeline
+
+pipe = PareDiffusionPipeline.from_pretrained(
+  "stabilityai/stable-diffusion-2",
+  device=torch.device("cuda"),
+  dtype=torch.float16,
+)
+prompt = "painting depicting the sea, sunrise, ship, artstation, 4k, concept art"
+
+image = pipe(prompt, width=512, height=512)
+display(image)
+```
+
+---
+level: 2
+layout: center
+---
+
+# どのように画像生成が行われているのか？
+
+---
+level: 2
+layout: image-right
+image: /exps/p-sd2-sample-43.png
+---
+
+# [<mdi-github-circle />PareDiffusers](https://github.com/masaishi/parediffusers)
+## <!-- TODO: Find better way, currently for avoide below becomes subtitle -->
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1I-qU3hfF19T42ksIh5FC0ReyKZ2hsJvx?usp=sharing)
+
+Install the PareDiffusers library:
+```python
+!pip install parediffusers
+```
+
+Generate an image from text:
+```python {11}{lines:true}
+import torch
+from parediffusers import PareDiffusionPipeline
+
+pipe = PareDiffusionPipeline.from_pretrained(
+  "stabilityai/stable-diffusion-2",
+  device=torch.device("cuda"),
+  dtype=torch.float16,
+)
+prompt = "painting depicting the sea, sunrise, ship, artstation, 4k, concept art"
+
+image = pipe(prompt, width=512, height=512)
+display(image)
+```
+
+---
+level: 2
+layout: center
+---
+
+<div v-click=1 v-click.hide=2>
+
+[<mdi-github-circle />pipeline.py#L117-L135](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py#L117-L135)
+
+</div>
+
+````md magic-move {style:'--slidev-code-font-size: 1.2rem; --slidev-code-line-height: 1.5;'}
+```python {all}
+image = pipe(prompt, width=512, height=512)
+```
+```python {all}
+def __call__(self, prompt: str, height: int = 512, width: int = 512, ...):
+	prompt_embeds = self.encode_prompt(prompt)
+	latents = self.get_latent(width, height).unsqueeze(dim=0)
+	latents = self.denoise(latents, prompt_embeds, ...)
+	image = self.vae_decode(latents)
+	return image
+```
+```md
+1. `encode_prompt` : プロンプトをCLIPモデルで、embeddingに変換する。
+2. `get_latent` : 生成したい画像サイズの、1/8のスケールでランダムなテンソルを生成する。
+3. `denoise` : プロンプトのembeddingから、UNetとSchedulerを用い反復的にデノイズする。
+4. `vae_decode` : デノイズされた潜在空間を画像空間にデコードする。
+```
+```md {all|1|2|3|4|all}
+1. `encode_prompt` : PromptをEmbeddingに変換する
+2. `get_latent` : ランダムなLatentを作る
+3. `denoise` : SchedulerとUNetを使って、デノイズを行う
+4. `vae_decode` : VAEで、画像にデコードする
+```
+````
+
+---
+level: 2
+layout: center
+---
+
+# ちょっとだけ理論
 
 ---
 level: 2
@@ -302,6 +462,7 @@ Conditioning、つまりpromptやsemantic map、repres entations, imagesなど�
 
 ---
 level: 2
+transition: fade
 ---
 
 <div class="flex flex-col !justify-between w-full h-120">
@@ -326,155 +487,9 @@ level: 2
 layout: center
 ---
 
-Latent Space(滞在空間)とは?
-
-# 入力画像の特徴を抽出した空間
-
-<!--
-TODO: VAEを通した画像の平均をとった画像を用意する。
--->
-
----
-level: 2
-layout: center
----
-
-ざっくりした説明
-
-<h1>1. PromptをEmbeddingに変換する<br />
-2. ランダムなLatentを作る<br />
-3. UNetで、デノイジングを行う<br />
-4. VAEでデコードし、画像を生成する</h1>
-
----
-level: 2
-layout: center
----
-
-# Diffusersとは?
-
-- Hugging Face🤗によって開発されたDiffusion Modelsを扱うライブラリ
-- 画像生成モデルを簡単に動かすことができる。
-- <mdi-github-circle /> https://github.com/huggingface/diffusers
-
----
-level: 2
-layout: image-right
-image: /exps/d-sd2-sample-42.png
----
-
-# [<mdi-github-circle />Diffusers](https://github.com/huggingface/diffusers)を試す
-## <!-- TODO: Find better way, currently for avoide below becomes subtitle -->
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1EbqeoWL5kPaDA8INLWl8g34v3vn83AQ5?usp=sharing)
-
-Install the Diffusers library:
-```python
-!pip install transformers diffusers accelerate -U
-```
-
-Generate an image from text:
-```python {all|4-7|8|10|all}{lines:true}
-import torch
-from diffusers import StableDiffusionPipeline
-
-pipe = StableDiffusionPipeline.from_pretrained(
-  "stabilityai/stable-diffusion-2",
-  dtype=torch.float16,
-).to(device=torch.device("cuda"))
-prompt = "painting depicting the sea, sunrise, ship, artstation, 4k, concept art"
-
-image = pipe(prompt, width=512, height=512).images[0]
-display(image)
-```
-
----
-level: 2
-layout: center
----
-
-# Diffusersは機能が豊富で柔軟性も高いが、<br />
-# その分コードの理解に時間がかかる。
-
----
-level: 2
----
-
-# [<mdi-github-circle />diffusers/.../pipeline_stable_diffusion.py](https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/stable_diffusion/pipeline_stable_diffusion.py)
-
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll mt-10" style="width:100%; height:85%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fhuggingface%2Fdiffusers%2Fblob%2Fmain%2Fsrc%2Fdiffusers%2Fpipelines%2Fstable_diffusion%2Fpipeline_stable_diffusion.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
-
----
-level: 2
----
-
-# [<mdi-github-circle />parediffusers/.../pipeline.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/pipeline.py)
-
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll mt-10" style="width:100%; height:85%;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fpipeline.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
-
----
-level: 2
-layout: image-right
-image: /exps/p-sd2-sample-43.png
----
-
-# [<mdi-github-circle />PareDiffusers](https://github.com/masaishi/parediffusers)
-## <!-- TODO: Find better way, currently for avoide below becomes subtitle -->
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1I-qU3hfF19T42ksIh5FC0ReyKZ2hsJvx?usp=sharing)
-
-Install the PareDiffusers library:
-```python
-!pip install parediffusers
-```
-
-Generate an image from text:
-```python {all|2|4|6}{lines:true}
-import torch
-from parediffusers import PareDiffusionPipeline
-
-pipe = PareDiffusionPipeline.from_pretrained(
-  "stabilityai/stable-diffusion-2",
-  device=torch.device("cuda"),
-  dtype=torch.float16,
-)
-prompt = "painting depicting the sea, sunrise, ship, artstation, 4k, concept art"
-
-image = pipe(prompt, width=512, height=512)
-display(image)
-```
-
----
-layout: cover
-title: Pipeline
-background: /backgrounds/pipeline.png
----
-
-# 5. Pipeline
-
-<p class="text-xs abs-bl w-full mb-6 text-center">Prompt: Pipeline, cyberpunk theme, best quality, high resolution, concept art</p>
-
----
-level: 2
-layout: image
-image: /images/stable-diffusion-figure.png
-backgroundSize: 70%
-class: 'text-black'
----
-
-<!-- Reference -->
-<p class="text-black text-xs abs-bl w-full mb-6 text-center">
-Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer: “High-Resolution Image Synthesis with Latent Diffusion Models”, 2021; <a href='http://arxiv.org/abs/2112.10752'>arXiv:2112.10752</a>.
-</p>
-
----
-level: 2
-layout: center
----
-
 <iframe frameborder="0" scrolling="no" style="width:100%; height:163px;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2F035772c684ae8d16c7c908f185f6413b72658126%2Fsrc%2Fparediffusers%2Fpipeline.py%23L131-L134&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
-<div class="w-full flex flex-col justify-center mt-10">
+<div class="w-full flex flex-col justify-center mt-10.7">
 <img src="/images/stable-diffusion-figure.png" alt="Stable Diffusion Figure" class="h-48 object-contain" />
 <p class="text-black text-xs w-full mt-6 text-center">
 Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer: “High-Resolution Image Synthesis with Latent Diffusion Models”, 2021; <a href='http://arxiv.org/abs/2112.10752'>arXiv:2112.10752</a>.
@@ -486,20 +501,80 @@ level: 2
 layout: center
 ---
 
-````md magic-move
-```python {all}{lines:true}
-prompt_embeds = self.encode_prompt(prompt)
-latents = self.get_latent(width, height).unsqueeze(dim=0)
-latents = self.denoise(latents, prompt_embeds, num_inference_steps, guidance_scale)
-image = self.vae_decode(latents)
-```
-```md {all|1|2|3|4|all}
-1. `encode_prompt` : テキストのプロンプトをembeddingに変換する。
-2. `get_latent` : 生成したい画像サイズの、1/8のスケールでランダムなテンソルを生成する。
-3. `denoise` : エンコードされたプロンプトのembeddingから、潜在空間を反復的にデノイズする。
-4. `vae_decode` : デノイズされた潜在空間を画像にデコードする。
-```
-````
+Latent Space(滞在空間)とは?
+
+# 入力画像の特徴を抽出した空間
+
+<!--
+TODO: VAEを通した画像の平均をとった画像を用意する。
+-->
+
+---
+level: 2
+layout: center
+transition: fade
+---
+
+4ステップでわかる画像生成の流れ
+
+<h1 class="!text-7">
+ステップ1: PromptをEmbeddingに変換する<br />
+ステップ2: ランダムなLatentを作る<br />
+ステップ3: SchedulerとUNetを使って、デノイズを行う<br />
+ステップ4: VAEで、画像にデコードする
+</h1>
+
+---
+level: 2
+layout: center
+---
+
+これからのスライドの流れ
+
+<h1 class="!text-7">
+ステップ1: encode_prompt<br />
+ステップ2: get_latent<br />
+ステップ3: denoise<br />
+ステップ4: vae_decode
+</h1>
+
+---
+layout: cover
+title: "ステップ1: encode_prompt"
+background: /backgrounds/pipeline.png
+---
+
+<h1>ステップ1: encode_prompt</h1>
+
+<p class="text-xs abs-bl w-full mb-6 text-center">Prompt: Pipeline, cyberpunk theme, best quality, high resolution, concept art</p>
+
+---
+level: 2
+layout: center
+transition: fade
+---
+
+ステップ1: encode_prompt
+# プロンプトをembeddingに変換する
+
+---
+level: 2
+layout: center
+---
+
+ステップ1: encode_prompt
+# プロンプトをモデルが扱いやすい形に変換する
+
+---
+level: 2
+layout: center
+---
+
+必要なもの
+# - [CLIPTokenizer](https://github.com/huggingface/transformers/blob/main/src/transformers/models/clip/tokenization_clip.py#L251)
+# - [CLIPTextModel](https://github.com/huggingface/transformers/blob/main/src/transformers/models/clip/modeling_clip.py)
+##
+From [<mdi-github-circle />huggingface/transformers](https://github.com/huggingface/transformers/tree/main)
 
 ---
 level: 2
@@ -507,7 +582,8 @@ layout: two-cols
 transition: fade
 ---
 
-# 5.1. encode_prompt
+<h1 class="!text-8.3">ステップ1: encode_prompt</h1>
+<p>encode_prompt内で、別の関数を呼び出している</p>
 
 ::right::
 
@@ -530,7 +606,8 @@ layout: two-cols
 transition: fade
 ---
 
-# 5.1. encode_prompt
+<h1 class="!text-8.3">ステップ1: encode_prompt</h1>
+<p>必要なものはどこで使われているか?</p>
 
 ::right::
 
@@ -562,7 +639,8 @@ layout: two-cols
 transition: fade
 ---
 
-# 5.1. encode_prompt
+<h1 class="!text-8.3">ステップ1: encode_prompt</h1>
+<p>必要なものはどこで使われているか?</p>
 
 <v-clicks every="1" at="1">
 
@@ -607,8 +685,8 @@ layout: two-cols
 transition: fade
 ---
 
-# 5.1. encode_prompt
-
+<h1 class="!text-8.3">ステップ1: encode_prompt</h1>
+<p>コードを読み全体の流れを理解する</p>
 
 - L54: `CLIPTokenizer`: テキスト(prompt)をトークン化。ベクトルにすることで、AIに扱いやすくさせる。
 
@@ -713,12 +791,39 @@ layout: center
 -->
 
 ---
-level: 2
-layout: custom-two-cols
-leftPercent: 0.3
+layout: cover
+title: "ステップ2: get_latent"
+background: /backgrounds/scheduler.png
 ---
 
-# 5.2. get_latent
+# ステップ2: get_latent
+
+<p class="text-xs abs-bl w-full mb-6 text-center">Prompt: Scheduler, flat vector illustration, best quality, high resolution</p>
+
+---
+level: 2
+layout: center
+---
+
+ステップ2: get_latent
+# 1/8のサイズのランダムなテンソルを生成
+
+---
+level: 2
+layout: center
+---
+
+必要なもの
+# torch.randn
+
+---
+level: 2
+layout: custom-two-cols
+leftPercent: 0.4
+---
+
+<h1 class="!text-8.3">ステップ2: get_latent</h1>
+<p>コードを読み全体の流れを理解する</p>
 
 <v-clicks every="1">
 
@@ -744,13 +849,49 @@ def get_latent(self, width: int, height: int):
 ```
 
 ---
+layout: cover
+title: "ステップ3: denoise"
+background: /backgrounds/unet.png
+---
+
+# ステップ3: denoise
+
+<p class="text-xs abs-bl w-full mb-6 text-center">Prompt: UNet, watercolor painting, detailed, brush strokes, best quality, high resolution</p>
+
+---
+level: 2
+layout: center
+---
+
+ステップ3: denoise
+# SchedulerとUNetを使って、デノイズを行う
+
+---
+level: 2
+layout: center
+---
+
+必要なもの
+# [<mdi-github-circle />scheduler.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/scheduler.py)
+# [<mdi-github-circle />unet.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/unet.py)
+
+---
+level: 2
+layout: center
+---
+
+ステップ3: denoise
+# その2つの詳細は置いておき、全体の流れ
+
+---
 level: 2
 layout: custom-two-cols
 leftPercent: 0.5
 transition: fade
 ---
 
-# 5.3. denoise
+# ステップ3: denoise
+必要なものはどこで使われているか?
 
 <v-clicks every="1">
 
@@ -794,7 +935,8 @@ leftPercent: 0.5
 transition: fade
 ---
 
-# 5.3. denoise
+# ステップ3: denoise
+必要なものはどこで使われているか?
 
 - L86: UNet2DConditionModel
 
@@ -840,7 +982,8 @@ layout: custom-two-cols
 leftPercent: 0.5
 ---
 
-# 5.3. denoise
+# ステップ3: denoise
+コードを読み全体の流れを理解する
 
 <v-clicks every="1">
 
@@ -885,77 +1028,6 @@ def denoise(self, latents, prompt_embeds, num_inference_steps=50, guidance_scale
 
 ---
 level: 2
-layout: center
----
-
-# 5.3. denoise
-SchedulerとUNetを使うということだけ覚えておいてください。
-
-::right::
-
-[<mdi-github-circle />pipeline.py#L82-L93](https://github.com/masaishi/parediffusers/blob/035772c684ae8d16c7c908f185f6413b72658126/src/parediffusers/pipeline.py#L82-L93)
-
-```python {all|80|82|86|88|91|all}{lines:true,startLine:75,at:1}
-@torch.no_grad()
-def denoise(self, latents, prompt_embeds, num_inference_steps=50, guidance_scale=7.5):
-	"""
-	Iteratively denoise the latent space using the diffusion model to produce an image.
-	"""
-	timesteps, num_inference_steps = self.retrieve_timesteps(num_inference_steps)
-
-	for t in timesteps:
-		latent_model_input = torch.cat([latents] * 2)
-		
-		# Predict the noise residual for the current timestep
-		noise_residual = self.unet(latent_model_input, t, encoder_hidden_states=prompt_embeds)
-		uncond_residual, text_cond_residual = noise_residual.chunk(2)
-		guided_noise_residual = uncond_residual + guidance_scale * (text_cond_residual - uncond_residual)
-
-		# Update latents by reversing the diffusion process for the current timestep
-		latents = self.scheduler.step(guided_noise_residual, t, latents)[0]
-
-	return latents
-```
-
----
-level: 2
-layout: custom-two-cols
-leftPercent: 0.4
----
-
-# 5.4. vae_decode
-
-<v-clicks every="1">
-</v-clicks>
-
-::right::
-
-[<mdi-github-circle />pipeline.py#L107-L105](https://github.com/masaishi/parediffusers/blob/035772c684ae8d16c7c908f185f6413b72658126/src/parediffusers/pipeline.py#L107-L115)
-
-```python {all}{lines:true,startLine:107,at:1}
-@torch.no_grad()
-def vae_decode(self, latents):
-	"""
-	Decode the latent tensors using the VAE to produce an image.
-	"""
-	image = self.vae.decode(latents / self.vae.config.scaling_factor)[0]
-	image = self.denormalize(image)
-	image = self.tensor_to_image(image)
-	return image
-```
-
----
-layout: cover
-title: Scheduler
-background: /backgrounds/scheduler.png
----
-
-# 6. Scheduler
-
-<p class="text-xs abs-bl w-full mb-6 text-center">Prompt: Scheduler, flat vector illustration, best quality, high resolution</p>
-
----
-level: 2
 ---
 
 # <span class="text-3xl">[<mdi-github-circle />scheduler.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/scheduler.py)</span>
@@ -968,16 +1040,6 @@ level: 2
 ---
 
 pipe.scheduler.step(guided_noise_residual, t, latents) をうまく使って、schedulerがどんなことをしているかのアニメーションを作りたい。
-
----
-layout: cover
-title: UNet
-background: /backgrounds/unet.png
----
-
-# 7. UNet
-
-<p class="text-xs abs-bl w-full mb-6 text-center">Prompt: UNet, watercolor painting, detailed, brush strokes, best quality, high resolution</p>
 
 ---
 level: 2
@@ -1003,31 +1065,6 @@ Olaf Ronneberger, Philipp Fischer, Thomas Brox: “U-Net: Convolutional Networks
 
 ---
 level: 2
-layout: center
----
-
-# 7.1 モデル作成
-
-```python
-class PareUNet2DConditionModel(nn.Module):
-	def __init__(self, **kwargs):
-		super().__init__()
-		self.config = DotDict(DEFAULT_UNET_CONFIG)
-		self.config.update(kwargs)
-		self.config.only_cross_attention = [self.config.only_cross_attention] * len(self.config.down_block_types)
-		self.config.num_attention_heads = self.config.num_attention_heads or self.config.attention_head_dim
-		self._setup_model_parameters()
-
-		self._build_input_layers()
-		self._build_time_embedding()
-		self._build_down_blocks()
-		self._build_mid_block()
-		self._build_up_blocks()
-		self._build_output_layers()
-```
-
----
-level: 2
 ---
 
 Transformer使っていること書く?
@@ -1040,11 +1077,11 @@ UNetで滞在空間を作って、平均を取れば特徴が抽出できるア�
 
 ---
 layout: cover
-title: VAE
+title: "ステップ4: vae_decode"
 background: /backgrounds/vae.png
 ---
 
-# 8. VAE
+# ステップ4: vae_decode
 
 <p class="text-xs abs-bl w-full mb-6 text-center">Prompt: VAE, abstract style, highly detailed, colors and shapes</p>
 
@@ -1063,6 +1100,41 @@ level: 2
 # [<mdi-github-circle />vae.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/vae.py)
 
 <iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fvae.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+---
+level: 2
+layout: custom-two-cols
+leftPercent: 0.4
+---
+
+<h1 class="!text-7.8">ステップ4: vae_decode</h1>
+<p>コードを読み全体の流れを理解する</p>
+
+<v-clicks every="1">
+
+- L112: VAEで画像にデコード
+
+- L113: 正規化して学習しているので、逆正規化する必要がある。
+
+- L114: テンソルからPIL.Imageに変換
+
+</v-clicks>
+
+::right::
+
+[<mdi-github-circle />pipeline.py#L107-L105](https://github.com/masaishi/parediffusers/blob/035772c684ae8d16c7c908f185f6413b72658126/src/parediffusers/pipeline.py#L107-L115)
+
+```python {all|112|113|114}{lines:true,startLine:107,at:1}
+@torch.no_grad()
+def vae_decode(self, latents):
+	"""
+	Decode the latent tensors using the VAE to produce an image.
+	"""
+	image = self.vae.decode(latents / self.vae.config.scaling_factor)[0]
+	image = self.denormalize(image)
+	image = self.tensor_to_image(image)
+	return image
+```
 
 ---
 level: 2
@@ -1108,7 +1180,7 @@ layout: center
 # 1. プロンプトのエンコード
 # 2. ランダムな潜在空間の生成
 # 3. UNetを用いてデノイジング
-# 4. Latent SpaceからPixel Spaceへのデコード
+# 4. VAEで、画像にデコードする
 
 ---
 level: 2
