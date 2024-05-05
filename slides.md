@@ -104,6 +104,7 @@ layout: center
 ---
 level: 2
 layout: center
+transition: fade
 ---
 
 # このスライドについて
@@ -123,6 +124,24 @@ layout: center
 
 [<mdi-source-pull />Pull Requests](https://github.com/masaishi/understand-stable-diffusion-slidev-ja/pulls): もし修正があればお送りください。
 <br />
+
+---
+level: 2
+layout: center
+---
+
+# このスライドについて
+画像生成の流れをコードと一緒に紹介というコンセプトのため、基本的に載せている全てのコードは、実際に動かすことができるようになっています。
+
+<br />
+
+### レポジトリ一覧
+
+[<mdi-github-circle />understand-stable-diffusion-slidev-ja](https://github.com/masaishi/understand-stable-diffusion-slidev-ja): このスライドのレポジトリ
+
+[<mdi-github-circle />understand-stable-diffusion-slidev-notebooks](https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks): サンプル画像や、gifを生成するためのノートブック
+
+[<mdi-github-circle />parediffusers](https://github.com/masaishi/parediffusers): メインで扱うライブラリ
 
 ---
 layout: center
@@ -716,7 +735,6 @@ def get_embes(self, prompt, max_length):
 ---
 level: 2
 layout: two-cols
-transition: fade
 ---
 
 <h1 class="!text-8.3">ステップ1: encode_prompt</h1>
@@ -905,6 +923,24 @@ level: 2
 layout: center
 ---
 
+<img src="/exps/denoised_latents_with_index.gif" class="h-96 object-contain mr-auto ml-auto" />
+
+[<mdi-github-circle />understand-stable-diffusion-slidev-notebooks/denoise.ipynb](https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/denoise.ipynb)
+
+---
+level: 2
+layout: center
+---
+
+<img src="/exps/decoded_images_with_index.gif" class="h-100 object-contain mr-auto ml-auto" />
+
+[<mdi-github-circle />understand-stable-diffusion-slidev-notebooks/denoise.ipynb](https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/denoise.ipynb)
+
+---
+level: 2
+layout: center
+---
+
 必要なもの
 # [<mdi-github-circle />scheduler.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/scheduler.py)
 # [<mdi-github-circle />unet.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/unet.py)
@@ -1021,11 +1057,11 @@ leftPercent: 0.5
 
 <v-clicks every="1">
 
-- L80: Schedulerを使いtimestepsの取得 <br />(<span class="text-sm">7. Schedulerで詳しく説明</span>)
+- L80: Schedulerを使いtimestepsの取得 <br />(<span class="text-sm">Schedulerについては後述</span>)
 
 - L82: timestepsの長さ分ループ<br />(<span class="text-sm">timestepsの長さ分 = num_inference_steps</span>)
 
-- L86: UNetでデノイズ <br />(<span class="text-sm">8. UNetで詳しく説明</span>)
+- L86: UNetでデノイズ <br />(<span class="text-sm">UNetについては後述</span>)
 
 - L88: どれだけプロンプトを考慮するかを計算 <br />(<span class="text-3">参考: 
 Jonathan Ho, Tim Salimans: “Classifier-Free Diffusion Guidance”, 2022; <a href='http://arxiv.org/abs/2207.12598'>arXiv:2207.12598</a>.</span>)
@@ -1068,6 +1104,84 @@ level: 2
 デノイズの強さを決定
 
 <iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fscheduler.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+---
+level: 2
+---
+
+[<mdi-github-circle />scheduler.py#L40-L59](https://github.com/masaishi/parediffusers/blob/17e8ece5e6104fbec34d64c4d87545f340b0ea50/src/parediffusers/scheduler.py#L40-L59)
+
+```python {all|49|49,50}{lines:true, startLine:40}
+def step(
+	self,
+	model_output: torch.FloatTensor,
+	timestep: int,
+	sample: torch.FloatTensor,
+) -> list:
+	"""Perform a single step of denoising in the diffusion process."""
+	prev_timestep = timestep - self.config.num_train_timesteps // self.num_inference_steps
+
+	alpha_prod_t = self.alphas_cumprod[timestep]
+	alpha_prod_t_prev = self.alphas_cumprod[prev_timestep] if prev_timestep >= 0 else self.final_alpha_cumprod
+
+	beta_prod_t = 1 - alpha_prod_t
+	pred_original_sample = (alpha_prod_t**0.5) * sample - (beta_prod_t**0.5) * model_output
+	pred_epsilon = (alpha_prod_t**0.5) * model_output + (beta_prod_t**0.5) * sample
+
+	pred_sample_direction = (1 - alpha_prod_t_prev) ** (0.5) * pred_epsilon
+	prev_sample = alpha_prod_t_prev ** (0.5) * pred_original_sample + pred_sample_direction
+
+	return prev_sample, pred_original_sample
+```
+
+---
+level: 2
+layout: center
+transition: fade
+---
+
+<div class="flex content-around gap-6">
+
+<img src="/exps/alpha_prod_t.png" class="h-64 object-contain ml-auto mr-auto" />
+
+<img src="/exps/alpha_prod_t_prev.png" class="h-64 object-contain ml-auto mr-auto" />
+
+</div>
+
+<p class="text-center">
+<a src="https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/scheduler.ipynb"><mdi-github-circle />understand-stable-diffusion-slidev-notebooks/scheduler.ipynb</a>
+</p>
+
+---
+level: 2
+layout: center
+transition: fade
+---
+
+<div class="flex content-around gap-6">
+<h1 class="!text-16 !mt-auto !mb-auto">−</h1>
+<img src="/exps/alpha_prod_t.png" class="h-64 object-contain ml-auto mr-auto" />
+<h1 class="!text-16 !mt-auto !mb-auto">+</h1>
+<img src="/exps/alpha_prod_t_prev.png" class="h-64 object-contain ml-auto mr-auto" />
+</div>
+
+<p class="text-center">
+<a src="https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/scheduler.ipynb"><mdi-github-circle />understand-stable-diffusion-slidev-notebooks/scheduler.ipynb</a>
+</p>
+
+---
+level: 2
+layout: center
+---
+
+<div class="flex content-around gap-6">
+<img src="/exps/alpha_diff.png" class="h-64 object-contain ml-auto mr-auto" />
+
+</div>
+
+<p class="text-center">
+<a src="https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/scheduler.ipynb"><mdi-github-circle />understand-stable-diffusion-slidev-notebooks/scheduler.ipynb</a>
+</p>
 
 ---
 level: 2
@@ -1124,16 +1238,8 @@ level: 2
 layout: center
 ---
 
-# Variational Autoencoder
-変分自己符号化器 (日本語訳かっこいい!)
-
----
-level: 2
----
-
-# [<mdi-github-circle />vae.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/vae.py)
-
-<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fvae.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+ステップ4: vae_decode
+# VAEで、画像にデコードする
 
 ---
 level: 2
@@ -1169,6 +1275,22 @@ def vae_decode(self, latents):
 	image = self.tensor_to_image(image)
 	return image
 ```
+
+---
+level: 2
+layout: center
+---
+
+# Variational Autoencoder
+変分自己符号化器 (日本語訳かっこいい!)
+
+---
+level: 2
+---
+
+# [<mdi-github-circle />vae.py](https://github.com/masaishi/parediffusers/blob/main/src/parediffusers/vae.py)
+
+<iframe frameborder="0" scrolling="yes" class="overflow-scroll iframe-full-code" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2Fmain%2Fsrc%2Fparediffusers%2Fvae.py&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
 ---
 level: 2
