@@ -1207,14 +1207,25 @@ level: 2
 
 <iframe frameborder="0" scrolling="no" class="scale-40 -translate-y-1/2 absolute top-50% left-25% w-full h-240%" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2Fmain%2Fembed%2Fwithout_scheduler.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
+<!--
+Schedulerを用いて学習を行なっているのに、それをなしで推論し比較しているのはずるい気がしますが。
+それでも輪郭などはどうような画像を生成することはできます。しかし、明らかにSchedulerがないときれいな画像の生成が出来ていないのがわかるかと思います。
+-->
+
 ---
 level: 2
 layout: center
 ---
 
-<h1 class="mb-0">なぜ<code>ratio = 1.475</code>前後がいいかは分からない</h1>
+<h1 class="mb-0">なぜ<code>ratio = 1.5</code>前後がいいかは分からない</h1>
 
-<img class="h-100 object-contain -mb-10 ml-auto mr-auto" src="/exps/custom_denoise_different_ratio.webp" />
+<img class="h-100 object-contain -mb-5 ml-auto mr-auto" src="/exps/custom_denoise_different_ratio.webp" />
+
+<p class="text-center">
+	<a src="https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/scheduler_necessity.ipynb">
+		<mdi-github-circle />understand-stable-diffusion-slidev-notebooks/scheduler_necessity.ipynb
+	</a>
+</p>
 
 ---
 level: 2
@@ -1240,15 +1251,51 @@ Olaf Ronneberger, Philipp Fischer, Thomas Brox: “U-Net: Convolutional Networks
 
 ---
 level: 2
+layout: center
 ---
 
-Transformer使っていること書く?
+# 本当にUになってる?
+
+```python
+init             torch.Size([2, 4, 64, 64])
+conv_in          torch.Size([2, 320, 64, 64])
+
+down_blocks_0    torch.Size([2, 320, 32, 32])
+down_blocks_1    torch.Size([2, 640, 16, 16])
+down_blocks_2    torch.Size([2, 1280, 8, 8])
+down_blocks_3    torch.Size([2, 1280, 8, 8])
+
+mid_block        torch.Size([2, 1280, 8, 8])
+
+up_blocks0       torch.Size([2, 1280, 16, 16])
+up_blocks1       torch.Size([2, 1280, 32, 32])
+up_blocks2       torch.Size([2, 640, 64, 64])
+up_blocks3       torch.Size([2, 320, 64, 64])
+
+conv_out         torch.Size([2, 4, 64, 64])
+```
+
+[<mdi-github-circle />understand-stable-diffusion-slidev-notebooks/unet.ipynb](https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/unet.ipynb)
 
 ---
 level: 2
 ---
 
-UNetで滞在空間を作って、平均を取れば特徴が抽出できるアニメーションでも作る?
+# ResnetとTransformerを使いUNetを作成
+
+<iframe frameborder="0" scrolling="yes" class="emg-res-transformer" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2F675b3fdaf4435e9982f92ff933f78db64f16a980%2Fsrc%2Fparediffusers%2Fmodels%2Funet_2d_blocks.py%23L114-L141&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+<style>
+	.emg-res-transformer {
+		transform: scale(0.68) translate(-50%, -50%);
+		transform-origin: top left;
+		position: absolute;
+		top: 63%;
+		left: 50%;
+		width: 100%;
+		height: 130%;
+	}
+</style>
 
 ---
 layout: cover
