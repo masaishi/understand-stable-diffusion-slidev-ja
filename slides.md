@@ -5,7 +5,7 @@ colorSchema: 'light'
 
 # random image from a curated Unsplash collection by Anthony
 # like them? see https://unsplash.com/collections/94734566/slidev
-background: backgrounds/understand-sd.png
+background: backgrounds/understand-sd.webp
 # some information about your slides, markdown enabled
 title: ソースコードから理解するStable Diffusion
 info: |
@@ -79,7 +79,7 @@ AI/MLとGISに興味があります。 <br />
 	</div>
 </div>
 
-<img src="/images/icon_tea_light.png" class="rounded-full w-35 abs-tr mt-12 mr-24" />
+<img src="/images/icon_tea_light.webp" class="rounded-full w-35 abs-tr mt-12 mr-24" />
 
 ---
 level: 2
@@ -88,7 +88,7 @@ layout: center
 
 # Kagglerにとって画像生成を使う機会は少ない?
 
-<img src="/images/stable-diffusion-image-to-prompts.png" class="h-100" />
+<img src="/images/stable-diffusion-image-to-prompts.webp" class="h-100" />
 
 <a src="https://www.kaggle.com/competitions/stable-diffusion-image-to-prompts/overview" target="_blank" class="abs-bl w-full mb-6 text-center text-xs text-black border-none!">https://www.kaggle.com/competitions/stable-diffusion-image-to-prompts/overview</a>
 
@@ -154,7 +154,7 @@ title: 目次
 ---
 layout: cover
 title: 画像生成の流れ
-background: /backgrounds/stable-diffusion.png
+background: /backgrounds/stable-diffusion.webp
 ---
 
 # 4. 画像生成の流れ
@@ -187,7 +187,7 @@ layout: center
 ---
 level: 2
 layout: image-right
-image: /exps/d-sd2-sample-42.png
+image: /exps/d-sd2-sample-42.webp
 ---
 
 # [<mdi-github-circle />Diffusers](https://github.com/huggingface/diffusers)を試す
@@ -242,7 +242,7 @@ level: 2
 ---
 level: 2
 layout: image-right
-image: /exps/p-sd2-sample-43.png
+image: /exps/p-sd2-sample-43.webp
 ---
 
 # [<mdi-github-circle />PareDiffusers](https://github.com/masaishi/parediffusers)
@@ -281,7 +281,7 @@ layout: center
 ---
 level: 2
 layout: image-right
-image: /exps/p-sd2-sample-43.png
+image: /exps/p-sd2-sample-43.webp
 ---
 
 # [<mdi-github-circle />PareDiffusers](https://github.com/masaishi/parediffusers)
@@ -360,7 +360,7 @@ layout: center
 4. `vae_decode` : VAEで、画像にデコードする
 ```
 
-<img src="/images/ldm-4step-figure.png" class="mt-5" />
+<img src="/images/ldm-4step-figure.webp" class="mt-5" />
 
 ---
 level: 2
@@ -396,7 +396,7 @@ Denoising Diffusion Probabilistic Model (DDPM)とは?
 
 <br />
 
-<img src="/images/ddpm-figure.png" class="abs-b mb-10 ml-auto mr-auto w-5/6" />
+<img src="/images/ddpm-figure.webp" class="abs-b mb-10 ml-auto mr-auto w-5/6" />
 
 <!-- Reference -->
 <p class="text-black text-xs abs-bl w-full mb-6 text-center">
@@ -535,7 +535,7 @@ transition: fade
 
 <div class="flex flex-col !justify-between w-full h-120">
 	<div>
-		<img src="/images/ddpm-figure.png" class="ml-auto mr-auto h-26" />
+		<img src="/images/ddpm-figure.webp" class="ml-auto mr-auto h-26" />
 		<!-- Reference -->
 		<p class="text-black text-xs w-full mt-6 text-center">
 		Jonathan Ho, Ajay Jain, Pieter Abbeel: “Denoising Diffusion Probabilistic Models”, 2020; <a href='http://arxiv.org/abs/2006.11239'>arXiv:2006.11239</a>.
@@ -543,7 +543,7 @@ transition: fade
 	</div>
 	<div v-click>
 		<span class="text-xs ml-27.5% mt-0 mb-0">Transformerの次に死ぬほど目にしたStable Diffusionの図</span>
-		<img src="/images/stable-diffusion-figure.png" alt="Stable Diffusion Figure" class="ml-auto mr-auto h-48 object-contain" />
+		<img src="/images/stable-diffusion-figure.webp" alt="Stable Diffusion Figure" class="ml-auto mr-auto h-48 object-contain" />
 		<p class="text-black text-xs w-full mt-6 text-center">
 		Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer: “High-Resolution Image Synthesis with Latent Diffusion Models”, 2021; <a href='http://arxiv.org/abs/2112.10752'>arXiv:2112.10752</a>.
 		</p>
@@ -558,7 +558,7 @@ layout: center
 <iframe frameborder="0" scrolling="no" style="width:100%; height:163px;" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Fparediffusers%2Fblob%2F035772c684ae8d16c7c908f185f6413b72658126%2Fsrc%2Fparediffusers%2Fpipeline.py%23L131-L134&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
 <div class="w-full flex flex-col justify-center mt-10.7">
-<img src="/images/stable-diffusion-figure.png" alt="Stable Diffusion Figure" class="h-48 object-contain" />
+<img src="/images/stable-diffusion-figure.webp" alt="Stable Diffusion Figure" class="h-48 object-contain" />
 <p class="text-black text-xs w-full mt-6 text-center">
 Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer: “High-Resolution Image Synthesis with Latent Diffusion Models”, 2021; <a href='http://arxiv.org/abs/2112.10752'>arXiv:2112.10752</a>.
 </p>
@@ -609,7 +609,7 @@ layout: center
 ---
 layout: cover
 title: "ステップ1: encode_prompt"
-background: /backgrounds/pipeline.png
+background: /backgrounds/pipeline.webp
 ---
 
 <h1>ステップ1: encode_prompt</h1>
@@ -860,7 +860,7 @@ layout: center
 ---
 layout: cover
 title: "ステップ2: get_latent"
-background: /backgrounds/scheduler.png
+background: /backgrounds/scheduler.webp
 ---
 
 # ステップ2: get_latent
@@ -896,7 +896,7 @@ leftPercent: 0.4
 
 - L63: 1/8のサイズのランダムなテンソルを生成
 
-<img src="/exps/latent.png" class="mt-5 h-48 object-contain" />
+<img src="/exps/latent.webp" class="mt-5 h-48 object-contain" />
 
 </v-clicks>
 
@@ -918,7 +918,7 @@ def get_latent(self, width: int, height: int):
 ---
 layout: cover
 title: "ステップ3: denoise"
-background: /backgrounds/unet.png
+background: /backgrounds/unet.webp
 ---
 
 # ステップ3: denoise
@@ -938,7 +938,7 @@ level: 2
 layout: center
 ---
 
-<img src="/exps/denoised_latents_with_index.gif" class="h-96 object-contain mr-auto ml-auto" />
+<img src="/exps/denoised_latents_with_index.webp" class="h-96 object-contain mr-auto ml-auto" />
 
 [<mdi-github-circle />understand-stable-diffusion-slidev-notebooks/denoise.ipynb](https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/denoise.ipynb)
 
@@ -947,7 +947,7 @@ level: 2
 layout: center
 ---
 
-<img src="/exps/decoded_images_with_index.gif" class="h-100 object-contain mr-auto ml-auto" />
+<img src="/exps/decoded_images_with_index.webp" class="h-100 object-contain mr-auto ml-auto" />
 
 [<mdi-github-circle />understand-stable-diffusion-slidev-notebooks/denoise.ipynb](https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/denoise.ipynb)
 
@@ -1157,9 +1157,9 @@ transition: fade
 
 <div class="flex content-around gap-6">
 
-<img src="/exps/alpha_prod_t.png" class="h-64 object-contain ml-auto mr-auto" />
+<img src="/exps/alpha_prod_t.webp" class="h-64 object-contain ml-auto mr-auto" />
 
-<img src="/exps/alpha_prod_t_prev.png" class="h-64 object-contain ml-auto mr-auto" />
+<img src="/exps/alpha_prod_t_prev.webp" class="h-64 object-contain ml-auto mr-auto" />
 
 </div>
 
@@ -1175,9 +1175,9 @@ transition: fade
 
 <div class="flex content-around gap-6">
 <h1 class="!text-16 !mt-auto !mb-auto">−</h1>
-<img src="/exps/alpha_prod_t.png" class="h-64 object-contain ml-auto mr-auto" />
+<img src="/exps/alpha_prod_t.webp" class="h-64 object-contain ml-auto mr-auto" />
 <h1 class="!text-16 !mt-auto !mb-auto">+</h1>
-<img src="/exps/alpha_prod_t_prev.png" class="h-64 object-contain ml-auto mr-auto" />
+<img src="/exps/alpha_prod_t_prev.webp" class="h-64 object-contain ml-auto mr-auto" />
 </div>
 
 <p class="text-center">
@@ -1190,7 +1190,7 @@ layout: center
 ---
 
 <div class="flex content-around gap-6">
-<img src="/exps/alpha_diff.png" class="h-64 object-contain ml-auto mr-auto" />
+<img src="/exps/alpha_diff.webp" class="h-64 object-contain ml-auto mr-auto" />
 
 </div>
 
@@ -1202,7 +1202,19 @@ layout: center
 level: 2
 ---
 
-pipe.scheduler.step(guided_noise_residual, t, latents) をうまく使って、schedulerがどんなことをしているかのアニメーションを作りたい。
+<iframe frameborder="0" scrolling="no" class="scale-40 -translate-y-1/2 absolute top-54% right-25% w-full h-240%" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2F606a033780f0c9aa0681fd1468f91f3961a73a3f%2Fembed%2Fwith_scheduler.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+
+<iframe frameborder="0" scrolling="no" class="scale-40 -translate-y-1/2 absolute top-50% left-25% w-full h-240%" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2Fmain%2Fembed%2Fwithout_scheduler.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+
+---
+level: 2
+layout: center
+---
+
+<h1 class="mb-0">なぜ<code>ratio = 1.475</code>前後がいいかは分からない</h1>
+
+<img class="h-100 object-contain -mb-10 ml-auto mr-auto" src="/exps/custom_denoise_different_ratio.webp" />
 
 ---
 level: 2
@@ -1216,7 +1228,7 @@ level: 2
 ---
 level: 2
 layout: image
-image: /images/unet-figure.png
+image: /images/unet-figure.webp
 backgroundSize: 70%
 class: 'text-black'
 ---
@@ -1241,7 +1253,7 @@ UNetで滞在空間を作って、平均を取れば特徴が抽出できるア�
 ---
 layout: cover
 title: "ステップ4: vae_decode"
-background: /backgrounds/vae.png
+background: /backgrounds/vae.webp
 ---
 
 # ステップ4: vae_decode
@@ -1317,7 +1329,7 @@ VAEを変えても画像が生成できる話?
 ---
 layout: cover
 title: まとめ
-background: /backgrounds/summary.png
+background: /backgrounds/summary.webp
 ---
 
 # 9. まとめ
@@ -1340,7 +1352,7 @@ layout: center
 
 [<mdi-github-circle />diffusers/.../pipeline.py](https://github.com/masaishi/parediffusers/blob/9e32721a4b1a63baf499517384e2a2acd9c08dae/src/parediffusers/pipeline.py)
 
-<img src="/images/diffusers-code-arxiv.png" class="mt-5 h-92 object-contain" />
+<img src="/images/diffusers-code-arxiv.webp" class="mt-5 h-92 object-contain" />
 
 ---
 level: 2
