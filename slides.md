@@ -15,6 +15,8 @@ info: |
 author: masaishi
 keywords: [ Stable Diffusion, Diffusers, parediffusers, AI, ML, Generative Models ]
 
+favicon: 'images/icon_tea_light.webp'
+
 export:
   format: pdf
   timeout: 30000
@@ -1122,6 +1124,59 @@ level: 2
 
 ---
 level: 2
+layout: custom-two-cols
+leftPercent: 0.5
+---
+
+# Scheduler
+
+<v-clicks every="1">
+
+- L49: alpha_prod_t(0~1.0)を取得<br />(<span class="text-sm">元のデータがどの程度保持されるかを示します。</span>)
+
+- L50: alpha_prod_t_prev(0~1.0)を取得
+
+- L52: alpha_prod_t + beta_prod_t = 1
+
+- L53: 現在のサンプルとモデル出力から元のサンプルを推定します。
+
+- L54: 追加されたノイズの推定値を計算します。これは、デノイジング過程でどのようにデータとノイズが操作されるかを反映しています。
+
+- L56:元の画像への復元する方向を計算します。
+
+- L57: 推定された元のサンプルと更新方向を組み合わせて、デノイジングを一歩進めたサンプルを計算します。
+
+</v-clicks>
+
+::right::
+
+[<mdi-github-circle />scheduler.py#L40-L59](https://github.com/masaishi/parediffusers/blob/17e8ece5e6104fbec34d64c4d87545f340b0ea50/src/parediffusers/scheduler.py#L40-L59)
+
+```python {all|49|50|52|53|54|56|57|all}{lines:true, at:1, startLine:40, style:'--slidev-code-font-size: 0.7rem; --slidev-code-line-height: 1.5;'}
+def step(
+	self,
+	model_output: torch.FloatTensor,
+	timestep: int,
+	sample: torch.FloatTensor,
+) -> list:
+	"""Perform a single step of denoising in the diffusion process."""
+	prev_timestep = timestep - self.config.num_train_timesteps // self.num_inference_steps
+
+	alpha_prod_t = self.alphas_cumprod[timestep]
+	alpha_prod_t_prev = self.alphas_cumprod[prev_timestep] if prev_timestep >= 0 else self.final_alpha_cumprod
+
+	beta_prod_t = 1 - alpha_prod_t
+	pred_original_sample = (alpha_prod_t**0.5) * sample - (beta_prod_t**0.5) * model_output
+	pred_epsilon = (alpha_prod_t**0.5) * model_output + (beta_prod_t**0.5) * sample
+
+	pred_sample_direction = (1 - alpha_prod_t_prev) ** (0.5) * pred_epsilon
+	prev_sample = alpha_prod_t_prev ** (0.5) * pred_original_sample + pred_sample_direction
+
+	return prev_sample, pred_original_sample
+```
+
+---
+level: 2
 ---
 
 [<mdi-github-circle />scheduler.py#L40-L59](https://github.com/masaishi/parediffusers/blob/17e8ece5e6104fbec34d64c4d87545f340b0ea50/src/parediffusers/scheduler.py#L40-L59)
@@ -1202,10 +1257,9 @@ layout: center
 level: 2
 ---
 
-<iframe frameborder="0" scrolling="no" class="scale-40 -translate-y-1/2 absolute top-54% right-25% w-full h-240%" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2F606a033780f0c9aa0681fd1468f91f3961a73a3f%2Fembed%2Fwith_scheduler.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+<iframe frameborder="0" scrolling="no" class="scale-40 -translate-y-1/2 absolute top-50% right-25% w-full h-240%" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2Fmain%2Fembed%2Fwithout_scheduler.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
-
-<iframe frameborder="0" scrolling="no" class="scale-40 -translate-y-1/2 absolute top-50% left-25% w-full h-240%" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2Fmain%2Fembed%2Fwithout_scheduler.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
+<iframe frameborder="0" scrolling="no" class="scale-40 -translate-y-1/2 absolute top-54% left-25% w-full h-240%" allow="clipboard-write" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fmasaishi%2Funderstand-stable-diffusion-slidev-notebooks%2Fblob%2F606a033780f0c9aa0681fd1468f91f3961a73a3f%2Fembed%2Fwith_scheduler.ipynb&style=github&type=ipynb&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></iframe>
 
 <!--
 Schedulerを用いて学習を行なっているのに、それをなしで推論し比較しているのはずるい気がしますが。
@@ -1248,34 +1302,6 @@ class: 'text-black'
 <p class="text-black text-xs abs-bl w-full mb-6 text-center">
 Olaf Ronneberger, Philipp Fischer, Thomas Brox: “U-Net: Convolutional Networks for Biomedical Image Segmentation”, 2015; <a href='http://arxiv.org/abs/1505.04597'>arXiv:1505.04597</a>.
 </p>
-
----
-level: 2
-layout: center
----
-
-# 本当にUになってる?
-
-```python
-init             torch.Size([2, 4, 64, 64])
-conv_in          torch.Size([2, 320, 64, 64])
-
-down_blocks_0    torch.Size([2, 320, 32, 32])
-down_blocks_1    torch.Size([2, 640, 16, 16])
-down_blocks_2    torch.Size([2, 1280, 8, 8])
-down_blocks_3    torch.Size([2, 1280, 8, 8])
-
-mid_block        torch.Size([2, 1280, 8, 8])
-
-up_blocks0       torch.Size([2, 1280, 16, 16])
-up_blocks1       torch.Size([2, 1280, 32, 32])
-up_blocks2       torch.Size([2, 640, 64, 64])
-up_blocks3       torch.Size([2, 320, 64, 64])
-
-conv_out         torch.Size([2, 4, 64, 64])
-```
-
-[<mdi-github-circle />understand-stable-diffusion-slidev-notebooks/unet.ipynb](https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/unet.ipynb)
 
 ---
 level: 2
@@ -1328,7 +1354,11 @@ leftPercent: 0.4
 
 - L112: VAEで画像にデコード
 
+<img src="/exps/vae_decode.webp" class="mb-5 h-28 object-contain" />
+
 - L113: 正規化して学習しているので、逆正規化する必要がある。
+
+<img src="/exps/vae_denormalize.webp" class="mb-5 h-28 object-contain" />
 
 - L114: テンソルからPIL.Imageに変換
 
@@ -1370,8 +1400,38 @@ level: 2
 level: 2
 ---
 
-VAEを変えても画像が生成できる話?
-画像生成推論サーバーのVAEを変更機能追加は、インターンで最初にやったことなのでちょっと話せるかも。
+<div class="w-full h-90% flex content-around gap-2 justify-center items-center">
+	<div>
+		<p class="text-1 text-center !line-height-0 !mt-0 !mb-1.5">[1, 512, 64, 64]</p>
+		<img src="/exps/vae_mid_0.webp" class="h-8 object-contain ml-auto mr-auto" />
+	</div>
+	<div>
+		<p class="text-1 text-center !line-height-0 !mt-0 !mb-1.5">[1, 512, 64, 64]</p>
+		<img src="/exps/vae_mid_1.webp" class="h-8 object-contain ml-auto mr-auto" />
+	</div>
+	<div>
+		<p class="text-2 text-center !line-height-0 !mt-0 !mb-2">[1, 512, 128, 128]</p>
+		<img src="/exps/vae_mid_2.webp" class="h-16 object-contain ml-auto mr-auto" />
+	</div>
+	<div>
+		<p class="text-3 text-center !line-height-0 !mt-0 !mb-2.5">[1, 512, 256, 256]</p>
+		<img src="/exps/vae_mid_3.webp" class="h-32 object-contain ml-auto mr-auto" />
+	</div>
+	<div>
+		<p class="text-4 text-center !line-height-0 !mt-0 !mb-3">[1, 256, 512, 512]</p>
+		<img src="/exps/vae_mid_4.webp" class="h-64 object-contain ml-auto mr-auto" />
+	</div>
+	<div>
+		<p class="text-4 text-center !line-height-0 !mt-0 !mb-3">[1, 128, 512, 512]</p>
+		<img src="/exps/vae_denormalize.webp" class="h-64 object-contain ml-auto mr-auto" />
+	</div>
+</div>
+
+<div class="w-full flex justify-center items-center">
+	<a class="" src="https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/vae.ipynb">
+		<mdi-github-circle />understand-stable-diffusion-slidev-notebooks/vae.ipynb
+	</a>
+</div>
 
 ---
 layout: cover
@@ -1413,8 +1473,38 @@ layout: center
 # 4. VAEで、画像にデコードする
 
 ---
+level: 1
+layout: center
+---
+
+# Appendix
+
+<Toc mode="onlyCurrentTree" maxDepth="2"></Toc>
+
+---
 level: 2
 layout: center
 ---
 
-# ご清聴ありがとうございました！
+# UNetは本当にUの形?
+
+```python
+init             torch.Size([2, 4, 64, 64])
+conv_in          torch.Size([2, 320, 64, 64])
+
+down_blocks_0    torch.Size([2, 320, 32, 32])
+down_blocks_1    torch.Size([2, 640, 16, 16])
+down_blocks_2    torch.Size([2, 1280, 8, 8])
+down_blocks_3    torch.Size([2, 1280, 8, 8])
+
+mid_block        torch.Size([2, 1280, 8, 8])
+
+up_blocks0       torch.Size([2, 1280, 16, 16])
+up_blocks1       torch.Size([2, 1280, 32, 32])
+up_blocks2       torch.Size([2, 640, 64, 64])
+up_blocks3       torch.Size([2, 320, 64, 64])
+
+conv_out         torch.Size([2, 4, 64, 64])
+```
+
+[<mdi-github-circle />understand-stable-diffusion-slidev-notebooks/unet.ipynb](https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/unet.ipynb)
