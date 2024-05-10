@@ -8,9 +8,7 @@ colorSchema: 'light'
 background: backgrounds/understand-sd.webp
 # some information about your slides, markdown enabled
 title: ソースコードから理解するStable Diffusion
-info: |
-  ## Stable Diffusionの画像生成コードの解説スライド
-  diffusersをシンプル化した、parediffusersというライブラリのコードを通じて、Latent Diffusion Modelsの画像生成の仕組みを解説するスライドです。
+info: Latent Diffusion Modelsによる画像生成を、ソースコードを通じて解説するスライド。diffusersをシンプルにした、parediffusersというライブラリのコードを通じて、画像生成の仕組みを解説するスライドです。
 
 author: masaishi
 keywords: [ Stable Diffusion, Diffusers, parediffusers, AI, ML, Generative Models ]
