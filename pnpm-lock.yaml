@@ -23,9 +23,6 @@ importers:
       '@unocss/preset-uno':
         specifier: ^0.59.4
         version: 0.59.4
-      playwright-chromium:
-        specifier: ^1.43.1
-        version: 1.43.1
       slidev-theme-penguin:
         specifier: ^1.7.1
         version: 1.7.1(typescript@5.4.5)
@@ -35,6 +32,10 @@ importers:
       vue:
         specifier: ^3.4.26
         version: 3.4.26(typescript@5.4.5)
+    devDependencies:
+      playwright-chromium:
+        specifier: ^1.43.1
+        version: 1.43.1
 
 packages:
 

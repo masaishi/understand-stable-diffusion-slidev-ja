@@ -1140,9 +1140,9 @@ leftPercent: 0.5
 
 - L53: 現在のサンプルとモデル出力から元のサンプルを推定します。
 
-- L54: 追加されたノイズの推定値を計算します。これは、デノイジング過程でどのようにデータとノイズが操作されるかを反映しています。
+- L54: 追加されたノイズの推定値を計算します。
 
-- L56:元の画像への復元する方向を計算します。
+- L56: 元の画像への復元する方向を計算します。
 
 - L57: 推定された元のサンプルと更新方向を組み合わせて、デノイジングを一歩進めたサンプルを計算します。
 
@@ -1480,6 +1480,40 @@ layout: center
 # Appendix
 
 <Toc mode="onlyCurrentTree" maxDepth="2"></Toc>
+
+---
+level: 2
+layout: center
+---
+
+# Other denoising samples
+
+<div class="flex content-around gap-6">
+
+<img src="/exps/text_cond_residuals_with_index.webp" class="h-64 object-contain ml-auto mr-auto" />
+
+<img src="/exps/uncond_residuals_with_index.webp" class="h-64 object-contain ml-auto mr-auto" />
+
+</div>
+
+[<mdi-github-circle />understand-stable-diffusion-slidev-notebooks/denoise.ipynb](https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/denoise.ipynb)
+
+---
+level: 2
+layout: center
+---
+
+# Other decorded denoising samples
+
+<div class="flex content-around gap-6">
+
+<img src="/exps/decoded_text_cond_residuals.webp" class="h-64 object-contain ml-auto mr-auto" />
+
+<img src="/exps/decoded_uncond_residuals.webp" class="h-64 object-contain ml-auto mr-auto" />
+
+</div>
+
+[<mdi-github-circle />understand-stable-diffusion-slidev-notebooks/denoise.ipynb](https://github.com/masaishi/understand-stable-diffusion-slidev-notebooks/blob/main/denoise.ipynb)
 
 ---
 level: 2
