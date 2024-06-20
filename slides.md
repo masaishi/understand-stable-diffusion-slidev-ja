@@ -280,38 +280,6 @@ layout: center
 
 ---
 level: 2
-layout: image-right
-image: /exps/p-sd2-sample-43.webp
----
-
-# [<mdi-github-circle />PareDiffusers](https://github.com/masaishi/parediffusers)
-## <!-- TODO: Find better way, currently for avoide below becomes subtitle -->
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1I-qU3hfF19T42ksIh5FC0ReyKZ2hsJvx?usp=sharing)
-
-Install the PareDiffusers library:
-```python
-!pip install parediffusers
-```
-
-Generate an image from text:
-```python {11}{lines:true}
-import torch
-from parediffusers import PareDiffusionPipeline
-
-pipe = PareDiffusionPipeline.from_pretrained(
-  "stabilityai/stable-diffusion-2",
-  device=torch.device("cuda"),
-  dtype=torch.float16,
-)
-prompt = "painting depicting the sea, sunrise, ship, artstation, 4k, concept art"
-
-image = pipe(prompt, width=512, height=512)
-display(image)
-```
-
----
-level: 2
 layout: center
 transition: fade
 ---
@@ -420,6 +388,15 @@ Latent Diffusion Model (LDM)とは?
 
 # <span v-mark.green="1">Latent Space (滞在空間)</span>で、
 # DDPMを動かすモデル
+
+---
+level: 2
+layout: center
+---
+
+Latent Space(滞在空間)とは?
+
+# 入力画像の特徴を抽出した空間
 
 ---
 level: 2
@@ -563,19 +540,6 @@ layout: center
 Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer: “High-Resolution Image Synthesis with Latent Diffusion Models”, 2021; <a href='http://arxiv.org/abs/2112.10752'>arXiv:2112.10752</a>.
 </p>
 </div>
-
----
-level: 2
-layout: center
----
-
-Latent Space(滞在空間)とは?
-
-# 入力画像の特徴を抽出した空間
-
-<!--
-TODO: VAEを通した画像の平均をとった画像を用意する。
--->
 
 ---
 level: 2
@@ -1352,11 +1316,11 @@ leftPercent: 0.4
 
 - L112: VAEで画像にデコード
 
-<img src="/exps/vae_decode.webp" class="mb-5 h-28 object-contain" />
+<img src="/exps/vae_decode.webp" class="mb-5 h-24 object-contain" />
 
 - L113: 正規化して学習しているので、逆正規化する必要がある。
 
-<img src="/exps/vae_denormalize.webp" class="mb-5 h-28 object-contain" />
+<img src="/exps/vae_denormalize.webp" class="mb-5 h-24 object-contain" />
 
 - L114: テンソルからPIL.Imageに変換
 
